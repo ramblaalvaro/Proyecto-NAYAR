@@ -1,0 +1,316 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NAYAR — Sistema de Inteligencia Espacial</title>
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@300;400;600;700&family=Exo+2:wght@200;400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-block">
+      <div class="logo-hex">
+        <svg viewBox="0 0 48 48" fill="none">
+          <polygon points="24,2 44,13 44,35 24,46 4,35 4,13" stroke="#00d4ff" stroke-width="1" fill="rgba(0,212,255,0.05)"/>
+          <polygon points="24,8 38,16 38,32 24,40 10,32 10,16" stroke="#00d4ff" stroke-width="0.5" fill="none" opacity="0.4"/>
+          <circle cx="24" cy="24" r="4" fill="#00d4ff" opacity="0.8"/>
+          <line x1="24" y1="8" x2="24" y2="20" stroke="#00d4ff" stroke-width="0.5" opacity="0.5"/>
+          <line x1="38" y1="16" x2="28" y2="22" stroke="#00d4ff" stroke-width="0.5" opacity="0.5"/>
+          <line x1="38" y1="32" x2="28" y2="26" stroke="#00d4ff" stroke-width="0.5" opacity="0.5"/>
+          <line x1="24" y1="40" x2="24" y2="28" stroke="#00d4ff" stroke-width="0.5" opacity="0.5"/>
+          <line x1="10" y1="32" x2="20" y2="26" stroke="#00d4ff" stroke-width="0.5" opacity="0.5"/>
+          <line x1="10" y1="16" x2="20" y2="22" stroke="#00d4ff" stroke-width="0.5" opacity="0.5"/>
+        </svg>
+      </div>
+      <div class="logo-text">
+        <h1>NAYAR</h1>
+        <p>Spatial Intelligence System · v2.4.1</p>
+      </div>
+    </div>
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="status-label">Nodo ESP32</span>
+        <span class="status-value">ACTIVO</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Dispositivos</span>
+        <span class="status-value" id="devCount">7</span>
+      </div>
+      <div class="status-item">
+        <span class="status-label">Uptime</span>
+        <span class="status-value" id="uptimeDisplay">04:32:11</span>
+      </div>
+      <div class="pulse-dot"></div>
+    </div>
+  </header>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+
+    <!-- FLOOR MAP -->
+    <div class="panel panel-map">
+      <div class="corner-tl"></div>
+      <div class="corner-br"></div>
+      <div class="panel-title">Mapa Espacial · Planta Baja</div>
+      <div class="floor-map-wrap">
+        <svg class="floor-svg" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+          <!-- Background -->
+          <rect width="600" height="300" fill="#050d15"/>
+
+          <!-- Outer walls -->
+          <rect x="30" y="20" width="540" height="260" fill="none" stroke="#0e2235" stroke-width="2"/>
+
+          <!-- Zone A: Sala Principal -->
+          <rect x="30" y="20" width="220" height="160" fill="rgba(0,212,255,0.04)" stroke="#0e2235" stroke-width="1"/>
+          <text x="80" y="42" font-family="Share Tech Mono" font-size="8" fill="#4a7a96" letter-spacing="2">ZONA A · SALA</text>
+          <!-- Occupation heatmap blobs -->
+          <ellipse cx="120" cy="100" rx="55" ry="40" fill="rgba(0,212,255,0.08)" opacity="0.9"/>
+          <ellipse cx="160" cy="110" rx="35" ry="28" fill="rgba(0,212,255,0.12)" opacity="0.9"/>
+
+          <!-- Zone B: Oficinas -->
+          <rect x="250" y="20" width="180" height="160" fill="rgba(0,255,157,0.03)" stroke="#0e2235" stroke-width="1"/>
+          <text x="295" y="42" font-family="Share Tech Mono" font-size="8" fill="#4a7a96" letter-spacing="2">ZONA B · OFIC.</text>
+          <ellipse cx="340" cy="95" rx="60" ry="45" fill="rgba(0,255,157,0.09)" opacity="0.9"/>
+
+          <!-- Zone C: Pasillo -->
+          <rect x="430" y="20" width="140" height="160" fill="rgba(255,107,53,0.03)" stroke="#0e2235" stroke-width="1"/>
+          <text x="455" y="42" font-family="Share Tech Mono" font-size="8" fill="#4a7a96" letter-spacing="2">ZONA C · PASO</text>
+
+          <!-- Zone D: Almacén -->
+          <rect x="30" y="180" width="540" height="100" fill="rgba(0,212,255,0.02)" stroke="#0e2235" stroke-width="1"/>
+          <text x="270" y="200" font-family="Share Tech Mono" font-size="8" fill="#4a7a96" letter-spacing="2">ZONA D · ALMACÉN</text>
+
+          <!-- Doors -->
+          <line x1="250" y1="20" x2="250" y2="80" stroke="#0a1622" stroke-width="3"/>
+          <path d="M250,20 Q280,20 280,50" fill="none" stroke="#1a3a52" stroke-width="1" stroke-dasharray="3,2"/>
+          <line x1="430" y1="20" x2="430" y2="80" stroke="#0a1622" stroke-width="3"/>
+          <path d="M430,20 Q460,20 460,50" fill="none" stroke="#1a3a52" stroke-width="1" stroke-dasharray="3,2"/>
+
+          <!-- ESP32 Node -->
+          <g transform="translate(295,140)">
+            <circle r="14" fill="rgba(0,212,255,0.1)" stroke="#00d4ff" stroke-width="1.5"/>
+            <circle r="8" fill="rgba(0,212,255,0.2)" stroke="#00d4ff" stroke-width="1"/>
+            <circle r="3" fill="#00d4ff"/>
+            <!-- Wifi rings -->
+            <circle r="20" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.3" stroke-dasharray="3,4">
+              <animate attributeName="r" values="14;30;14" dur="3s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.5;0;0.5" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <circle r="40" fill="none" stroke="#00d4ff" stroke-width="0.5" opacity="0.2" stroke-dasharray="2,5">
+              <animate attributeName="r" values="20;50;20" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.3;0;0.3" dur="3s" begin="0.5s" repeatCount="indefinite"/>
+            </circle>
+            <text dy="-18" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="#00d4ff">ESP32</text>
+          </g>
+
+          <!-- Device dots -->
+          <!-- D1 Zone A -->
+          <g transform="translate(110,95)">
+            <circle r="5" fill="rgba(0,255,157,0.8)" stroke="#00ff9d" stroke-width="1">
+              <animate attributeName="r" values="5;7;5" dur="2s" repeatCount="indefinite"/>
+            </circle>
+            <text dy="-9" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="#00ff9d">D1</text>
+          </g>
+          <!-- D2 Zone A -->
+          <g transform="translate(155,115)">
+            <circle r="5" fill="rgba(0,255,157,0.8)" stroke="#00ff9d" stroke-width="1">
+              <animate attributeName="r" values="5;7;5" dur="2.5s" repeatCount="indefinite"/>
+            </circle>
+            <text dy="-9" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="#00ff9d">D2</text>
+          </g>
+          <!-- D3 Zone B -->
+          <g transform="translate(330,85)">
+            <circle r="5" fill="rgba(0,212,255,0.9)" stroke="#00d4ff" stroke-width="1">
+              <animate attributeName="r" values="5;7;5" dur="1.8s" repeatCount="indefinite"/>
+            </circle>
+            <text dy="-9" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="#00d4ff">D3</text>
+          </g>
+          <!-- D4 Zone B -->
+          <g transform="translate(370,110)">
+            <circle r="5" fill="rgba(0,212,255,0.9)" stroke="#00d4ff" stroke-width="1">
+              <animate attributeName="r" values="5;7;5" dur="3s" repeatCount="indefinite"/>
+            </circle>
+            <text dy="-9" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="#00d4ff">D4</text>
+          </g>
+          <!-- D5 Zone C (weak) -->
+          <g transform="translate(490,90)">
+            <circle r="5" fill="rgba(255,107,53,0.8)" stroke="#ff6b35" stroke-width="1">
+              <animate attributeName="r" values="5;6;5" dur="4s" repeatCount="indefinite"/>
+            </circle>
+            <text dy="-9" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="#ff6b35">D5</text>
+          </g>
+          <!-- D6 Zone D -->
+          <g transform="translate(200,230)">
+            <circle r="5" fill="rgba(0,255,157,0.7)" stroke="#00ff9d" stroke-width="1">
+              <animate attributeName="r" values="5;7;5" dur="2.2s" repeatCount="indefinite"/>
+            </circle>
+            <text dy="-9" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="#00ff9d">D6</text>
+          </g>
+          <!-- D7 Zone D -->
+          <g transform="translate(420,230)">
+            <circle r="5" fill="rgba(0,212,255,0.7)" stroke="#00d4ff" stroke-width="1">
+              <animate attributeName="r" values="5;7;5" dur="2.7s" repeatCount="indefinite"/>
+            </circle>
+            <text dy="-9" text-anchor="middle" font-family="Share Tech Mono" font-size="7" fill="#00d4ff">D7</text>
+          </g>
+
+          <!-- Legend -->
+          <circle cx="42" cy="285" r="4" fill="#00ff9d" opacity="0.8"/>
+          <text x="50" y="289" font-family="Share Tech Mono" font-size="8" fill="#4a7a96">RSSI fuerte</text>
+          <circle cx="130" cy="285" r="4" fill="#00d4ff" opacity="0.8"/>
+          <text x="138" y="289" font-family="Share Tech Mono" font-size="8" fill="#4a7a96">RSSI medio</text>
+          <circle cx="218" cy="285" r="4" fill="#ff6b35" opacity="0.8"/>
+          <text x="226" y="289" font-family="Share Tech Mono" font-size="8" fill="#4a7a96">RSSI débil</text>
+          <circle cx="296" cy="285" r="6" fill="none" stroke="#00d4ff" stroke-width="1.5"/>
+          <circle cx="296" cy="285" r="2" fill="#00d4ff"/>
+          <text x="306" y="289" font-family="Share Tech Mono" font-size="8" fill="#4a7a96">Nodo ESP32</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="panel">
+      <div class="corner-tl"></div>
+      <div class="panel-title">Métricas en Tiempo Real</div>
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-label">Dispositivos</div>
+          <div class="metric-value" id="metricDev">7</div>
+          <div class="metric-unit">activos</div>
+        </div>
+        <div class="metric-card green">
+          <div class="metric-label">Ocupación</div>
+          <div class="metric-value green" id="metricOcc">64</div>
+          <div class="metric-unit">%</div>
+        </div>
+        <div class="metric-card warn">
+          <div class="metric-label">Alerta RSSI</div>
+          <div class="metric-value warn">-78</div>
+          <div class="metric-unit">dBm · Zona C</div>
+        </div>
+        <div class="metric-card green">
+          <div class="metric-label">Ahorro</div>
+          <div class="metric-value green">23</div>
+          <div class="metric-unit">% energía</div>
+        </div>
+      </div>
+      <div class="node-status">
+        <div class="pulse-dot"></div>
+        <span class="node-status-text">NAYAR-NODE-01 · Canal 6 · 2.4GHz</span>
+      </div>
+    </div>
+
+    <!-- RSSI SIGNALS -->
+    <div class="panel">
+      <div class="corner-tl"></div>
+      <div class="panel-title">Señal RSSI · WiFi Sniffing</div>
+      <div class="signal-chart" id="signalChart">
+        <!-- Bars rendered by JS -->
+      </div>
+    </div>
+
+    <!-- DEVICE LIST -->
+    <div class="panel" style="grid-column: span 2;">
+      <div class="corner-tl"></div>
+      <div class="corner-br"></div>
+      <div class="panel-title">Dispositivos Detectados · Fingerprinting</div>
+      <div class="device-list" id="deviceList"></div>
+    </div>
+
+    <!-- ENERGY -->
+    <div class="panel">
+      <div class="corner-tl"></div>
+      <div class="panel-title">Eficiencia Energética · Zonas</div>
+      <div class="energy-bars" id="energyBars"></div>
+    </div>
+
+    <!-- EVENT LOG -->
+    <div class="panel" style="grid-column: span 2;">
+      <div class="corner-tl"></div>
+      <div class="panel-title">Log de Eventos del Sistema</div>
+      <div class="event-log" id="eventLog"></div>
+    </div>
+
+    <!-- EVENT LOG 2 -->
+    <div class="panel">
+      <div class="corner-tl"></div>
+      <div class="panel-title">Business Intelligence</div>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px;" id="biPanel">
+      </div>
+    </div>
+
+    <!-- TECH STACK -->
+    <div class="panel panel-tech">
+      <div class="panel-title">Stack Tecnológico</div>
+      <div class="tech-stack">
+        <div class="tech-node">
+          <div class="tech-dot" style="background:#00d4ff;box-shadow:0 0 6px #00d4ff"></div>
+          <div>
+            <div class="tech-name">ESP32</div>
+            <div class="tech-role">Nodo Standalone · Sensor</div>
+          </div>
+        </div>
+        <div class="tech-node">
+          <div class="tech-dot" style="background:#ff6b35;box-shadow:0 0 6px #ff6b35"></div>
+          <div>
+            <div class="tech-name">Antena WiFi Externa</div>
+            <div class="tech-role">Alcance Extendido · RSSI</div>
+          </div>
+        </div>
+        <div class="tech-node">
+          <div class="tech-dot" style="background:#00ff9d;box-shadow:0 0 6px #00ff9d"></div>
+          <div>
+            <div class="tech-name">Vue.js / HTML5</div>
+            <div class="tech-role">Frontend · Dashboard</div>
+          </div>
+        </div>
+        <div class="tech-node">
+          <div class="tech-dot" style="background:#a78bfa;box-shadow:0 0 6px #a78bfa"></div>
+          <div>
+            <div class="tech-name">Quasar Framework</div>
+            <div class="tech-role">Tech Corner · UI Components</div>
+          </div>
+        </div>
+        <div class="tech-node">
+          <div class="tech-dot" style="background:#fbbf24;box-shadow:0 0 6px #fbbf24"></div>
+          <div>
+            <div class="tech-name">Python / Go</div>
+            <div class="tech-role">Backend · API · ML Pipeline</div>
+          </div>
+        </div>
+        <div class="tech-node">
+          <div class="tech-dot" style="background:#00d4ff;box-shadow:0 0 6px #00d4ff"></div>
+          <div>
+            <div class="tech-name">WiFi RSSI / Sniffing</div>
+            <div class="tech-role">Detección sin cámara · Privacidad</div>
+          </div>
+        </div>
+        <div class="tech-node">
+          <div class="tech-dot" style="background:#00ff9d;box-shadow:0 0 6px #00ff9d"></div>
+          <div>
+            <div class="tech-name">Smartphone ID</div>
+            <div class="tech-role">Fingerprint por señal MAC</div>
+          </div>
+        </div>
+        <div class="tech-node">
+          <div class="tech-dot" style="background:#ff6b35;box-shadow:0 0 6px #ff6b35"></div>
+          <div>
+            <div class="tech-name">BI Engine</div>
+            <div class="tech-role">Optimización · Analytics</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main-grid -->
+</div><!-- /shell -->
+
+
+<script src="main.js"></script>
+</body>
+</html>
