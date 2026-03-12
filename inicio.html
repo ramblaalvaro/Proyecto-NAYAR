@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Proyecto NAYAR</title>
+
+<style>
+
+body{
+    margin:0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color:#050b12;
+    color:#00e5ff;
+    height:100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    /* grid futurista */
+    background-image:
+    linear-gradient(rgba(0,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,255,0.05) 1px, transparent 1px);
+    background-size:40px 40px;
+}
+
+/* título */
+.titulo{
+    font-size:42px;
+    letter-spacing:6px;
+    font-weight:600;
+    margin-bottom:30px;
+}
+
+/* caja login */
+.login-box{
+    background:rgba(10,20,35,0.85);
+    padding:40px;
+    width:320px;
+    border-radius:8px;
+    border:1px solid rgba(0,255,255,0.25);
+    box-shadow:0 0 25px rgba(0,255,255,0.15);
+}
+
+/* subtitulo */
+.login-box h2{
+    text-align:center;
+    font-weight:500;
+    margin-bottom:25px;
+}
+
+/* inputs */
+input{
+    width:100%;
+    padding:10px;
+    margin-bottom:15px;
+    background:#07121f;
+    border:1px solid #0a3d4a;
+    border-radius:4px;
+    color:#00e5ff;
+    outline:none;
+}
+
+/* efecto foco */
+input:focus{
+    border:1px solid #00e5ff;
+    box-shadow:0 0 10px rgba(0,255,255,0.5);
+}
+
+/* botón */
+button{
+    width:100%;
+    padding:10px;
+    background:#00e5ff;
+    border:none;
+    color:#002028;
+    font-weight:bold;
+    border-radius:4px;
+    cursor:pointer;
+    transition:0.2s;
+}
+
+button:hover{
+    box-shadow:0 0 12px #00e5ff;
+}
+
+#error{
+    color:#ff4d4d;
+    font-size:13px;
+    text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="titulo">NAYAR</div>
+
+<div class="login-box">
+
+<h2>Acceso al sistema</h2>
+
+<input type="text" id="usuario" placeholder="Usuario">
+<input type="password" id="password" placeholder="Contraseña">
+
+<button onclick="login()">CONECTAR</button>
+
+<p id="error"></p>
+
+</div>
+
+<script>
+
+function login(){
+
+let user = document.getElementById("usuario").value;
+let pass = document.getElementById("password").value;
+
+if(user === "admin" && pass === "1234"){
+    window.location.href = "index.html";
+}else{
+    document.getElementById("error").innerText = "Acceso denegado";
+}
+
+}
+
+</script>
+
+</body>
+</html>
