@@ -2,473 +2,263 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Proyecto NAYAR — Solicitar Acceso</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAYAR — Solicitar Acceso</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@300;400;600&family=Rajdhani:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&display=swap');
-
   :root {
-    --cyan: #00e5ff;
-    --cyan-dim: rgba(0,229,255,0.15);
-    --cyan-glow: rgba(0,229,255,0.5);
-    --bg: #050b12;
-    --panel: rgba(10,20,35,0.90);
-    --red: #ff4d4d;
+    --bg:    #040a10;
+    --cyan:  #00e5ff;
+    --cyan2: rgba(0,229,255,0.6);
+    --red:   #ff3c3c;
     --green: #00ffb3;
-    --text-muted: rgba(0,229,255,0.5);
+    --text:  #a8c8d8;
+    --muted: #2d5566;
+    --mono:  'JetBrains Mono', monospace;
+    --head:  'Bebas Neue', sans-serif;
+    --body:  'Rajdhani', sans-serif;
   }
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
+  *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
   body {
-    font-family: 'Rajdhani', sans-serif;
-    background-color: var(--bg);
-    color: var(--cyan);
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    background-image:
-      linear-gradient(rgba(0,255,255,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,255,0.04) 1px, transparent 1px);
-    background-size: 40px 40px;
-    padding: 20px;
+    background:var(--bg); color:var(--cyan); font-family:var(--body);
+    min-height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; overflow:hidden; cursor:crosshair; padding:20px;
   }
-
-  /* Scanline overlay */
+  canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+  body::before {
+    content:''; position:fixed; inset:0; z-index:1;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.08) 2px,rgba(0,0,0,0.08) 4px);
+    pointer-events:none; animation:scanMove 8s linear infinite;
+  }
+  @keyframes scanMove { 0%{background-position:0 0} 100%{background-position:0 100px} }
   body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.08) 2px,
-      rgba(0,0,0,0.08) 4px
-    );
-    pointer-events: none;
-    z-index: 100;
+    content:''; position:fixed; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,transparent,var(--cyan2),transparent);
+    z-index:2; pointer-events:none; animation:hScan 6s linear infinite; opacity:0.4;
   }
+  @keyframes hScan { 0%{top:-10px;opacity:0} 5%{opacity:0.4} 95%{opacity:0.4} 100%{top:100vh;opacity:0} }
 
-  .titulo {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 38px;
-    letter-spacing: 10px;
-    font-weight: 400;
-    margin-bottom: 6px;
-    text-shadow: 0 0 20px var(--cyan), 0 0 40px var(--cyan-glow);
-    animation: flicker 6s infinite;
-  }
+  .wrapper { position:relative; z-index:10; display:flex; flex-direction:column; align-items:center; animation:wrapIn 0.8s cubic-bezier(0.2,0,0,1) both; }
+  @keyframes wrapIn { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:none} }
 
-  .subtitulo {
-    font-size: 13px;
-    letter-spacing: 4px;
-    color: var(--text-muted);
-    margin-bottom: 36px;
-    font-family: 'Share Tech Mono', monospace;
-  }
-
-  @keyframes flicker {
-    0%, 95%, 100% { opacity: 1; }
-    96% { opacity: 0.7; }
-    97% { opacity: 1; }
-    98% { opacity: 0.6; }
-    99% { opacity: 1; }
-  }
+  .brand { text-align:center; margin-bottom:32px; animation:wrapIn 0.8s 0.1s cubic-bezier(0.2,0,0,1) both; }
+  .brand-hex { display:inline-block; margin-bottom:10px; filter:drop-shadow(0 0 12px var(--cyan2)); animation:hexPulse 4s ease-in-out infinite; }
+  @keyframes hexPulse { 0%,100%{filter:drop-shadow(0 0 8px var(--cyan2))} 50%{filter:drop-shadow(0 0 22px var(--cyan))} }
+  .brand h1 { font-family:var(--head); font-size:64px; letter-spacing:14px; color:var(--cyan); line-height:1; text-shadow:0 0 30px rgba(0,229,255,0.4),0 0 60px rgba(0,229,255,0.15); }
+  .brand-sub { font-family:var(--mono); font-size:9px; letter-spacing:4px; color:var(--muted); text-transform:uppercase; margin-top:6px; }
 
   .panel {
-    background: var(--panel);
-    padding: 40px 36px;
-    width: 100%;
-    max-width: 400px;
-    border-radius: 6px;
-    border: 1px solid rgba(0,229,255,0.2);
-    box-shadow: 0 0 30px rgba(0,229,255,0.1), inset 0 0 30px rgba(0,0,0,0.3);
-    position: relative;
+    width:100%; max-width:400px;
+    background:linear-gradient(160deg,rgba(13,34,54,0.95) 0%,rgba(4,10,16,0.98) 100%);
+    border:1px solid rgba(0,229,255,0.2); border-radius:4px; padding:36px 32px 28px; position:relative;
+    box-shadow:0 0 0 1px rgba(0,229,255,0.05),0 20px 60px rgba(0,0,0,0.6),inset 0 1px 0 rgba(0,229,255,0.08);
+    animation:wrapIn 0.8s 0.2s cubic-bezier(0.2,0,0,1) both;
   }
+  .panel::before,.panel::after { content:''; position:absolute; width:12px; height:12px; border-color:var(--cyan); border-style:solid; }
+  .panel::before { top:-1px; left:-1px; border-width:2px 0 0 2px; }
+  .panel::after  { bottom:-1px; right:-1px; border-width:0 2px 2px 0; }
+  .corner-tr,.corner-bl { position:absolute; width:12px; height:12px; border-color:var(--cyan); border-style:solid; }
+  .corner-tr { top:-1px; right:-1px; border-width:2px 2px 0 0; }
+  .corner-bl { bottom:-1px; left:-1px; border-width:0 0 2px 2px; }
 
-  /* Corner decorations */
-  .panel::before, .panel::after {
-    content: '';
-    position: absolute;
-    width: 14px; height: 14px;
-    border-color: var(--cyan);
-    border-style: solid;
-  }
-  .panel::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
-  .panel::after  { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+  .box-header { display:flex; align-items:center; gap:10px; margin-bottom:28px; padding-bottom:14px; border-bottom:1px solid rgba(0,229,255,0.08); }
+  .box-status-dot { width:6px; height:6px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px var(--cyan); animation:blink 2s infinite; flex-shrink:0; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .box-title { font-family:var(--mono); font-size:9px; letter-spacing:2.5px; color:var(--text); text-transform:uppercase; flex:1; }
+  .box-id    { font-family:var(--mono); font-size:8px; color:var(--muted); letter-spacing:1px; }
 
-  .panel-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 28px;
-    padding-bottom: 16px;
-    border-bottom: 1px solid rgba(0,229,255,0.12);
-  }
-
-  .panel-header .icon {
-    font-size: 22px;
-    line-height: 1;
-  }
-
-  .panel-header h2 {
-    font-size: 17px;
-    font-weight: 600;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-  }
-
-  .field {
-    margin-bottom: 16px;
-  }
-
-  label {
-    display: block;
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--text-muted);
-    margin-bottom: 6px;
-    text-transform: uppercase;
-    font-family: 'Share Tech Mono', monospace;
-  }
+  .field-group { margin-bottom:16px; }
+  .field-label { font-family:var(--mono); font-size:8px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:6px; display:block; transition:color 0.2s; }
+  .field-group:focus-within .field-label { color:var(--cyan); }
+  .field-input-wrap { position:relative; display:flex; align-items:center; }
+  .field-icon { position:absolute; left:10px; color:var(--muted); font-size:11px; transition:color 0.2s; pointer-events:none; font-family:var(--mono); }
+  .field-group:focus-within .field-icon { color:var(--cyan); }
 
   input, textarea {
-    width: 100%;
-    padding: 10px 12px;
-    background: #07121f;
-    border: 1px solid #0a3d4a;
-    border-radius: 4px;
-    color: var(--cyan);
-    font-family: 'Rajdhani', sans-serif;
-    font-size: 15px;
-    outline: none;
-    transition: border 0.2s, box-shadow 0.2s;
-    resize: none;
+    width:100%; padding:10px 12px 10px 30px;
+    background:rgba(0,229,255,0.03); border:1px solid rgba(0,229,255,0.12);
+    border-radius:3px; color:var(--cyan); font-family:var(--mono); font-size:13px;
+    letter-spacing:1px; outline:none; resize:none;
+    transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
   }
+  input::placeholder, textarea::placeholder { color:var(--muted); font-size:11px; letter-spacing:1px; }
+  input:focus, textarea:focus { border-color:var(--cyan); background:rgba(0,229,255,0.05); box-shadow:0 0 0 3px rgba(0,229,255,0.08),0 0 16px rgba(0,229,255,0.1); }
+  textarea { height:90px; padding-top:10px; }
 
-  input:focus, textarea:focus {
-    border-color: var(--cyan);
-    box-shadow: 0 0 12px rgba(0,229,255,0.35);
-  }
+  .btn-submit { width:100%; padding:12px; margin-top:8px; background:transparent; border:1px solid var(--cyan); color:var(--cyan); font-family:var(--mono); font-size:11px; letter-spacing:4px; text-transform:uppercase; border-radius:3px; cursor:pointer; position:relative; overflow:hidden; transition:color 0.3s; }
+  .btn-submit::before { content:''; position:absolute; inset:0; background:var(--cyan); transform:translateX(-101%); transition:transform 0.3s cubic-bezier(0.4,0,0.2,1); z-index:0; }
+  .btn-submit:hover::before { transform:translateX(0); }
+  .btn-submit:hover { color:#001820; }
+  .btn-submit span { position:relative; z-index:1; }
+  .btn-submit.loading { pointer-events:none; }
+  .btn-submit.loading span { opacity:0; }
+  .btn-submit.loading::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,var(--cyan2),transparent); background-size:200% 100%; animation:loadSlide 0.8s linear infinite; z-index:1; }
+  @keyframes loadSlide { 0%{background-position:-100% 0} 100%{background-position:200% 0} }
 
-  textarea { height: 90px; }
+  .btn-back { width:100%; padding:10px; margin-top:10px; background:transparent; border:1px solid rgba(0,229,255,0.15); color:var(--muted); font-family:var(--mono); font-size:10px; letter-spacing:3px; text-transform:uppercase; border-radius:3px; cursor:pointer; transition:all 0.2s; }
+  .btn-back:hover { border-color:var(--cyan); color:var(--cyan); }
 
-  .btn {
-    width: 100%;
-    padding: 12px;
-    background: transparent;
-    border: 1px solid var(--cyan);
-    color: var(--cyan);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 14px;
-    letter-spacing: 4px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
-    margin-top: 8px;
-    text-transform: uppercase;
-    position: relative;
-    overflow: hidden;
-  }
+  .error-msg { height:18px; margin-top:10px; font-family:var(--mono); font-size:9px; letter-spacing:2px; color:var(--red); text-align:center; text-transform:uppercase; opacity:0; transform:translateY(-4px); transition:opacity 0.2s,transform 0.2s; }
+  .error-msg.show { opacity:1; transform:none; }
 
-  .btn:hover {
-    background: var(--cyan-dim);
-    box-shadow: 0 0 18px var(--cyan-glow);
-    color: #fff;
-  }
+  /* Success */
+  .success-section { display:none; text-align:center; padding:10px 0; }
+  .success-icon { font-size:48px; margin-bottom:16px; animation:pulseGreen 2s infinite; }
+  @keyframes pulseGreen { 0%,100%{text-shadow:0 0 10px var(--green)} 50%{text-shadow:0 0 25px var(--green),0 0 50px var(--green)} }
+  .success-section h3 { font-family:var(--head); font-size:28px; letter-spacing:6px; color:var(--green); margin-bottom:10px; }
+  .success-section p { font-family:var(--mono); font-size:10px; color:var(--muted); line-height:1.8; letter-spacing:1px; }
 
-  .btn:active { transform: scale(0.98); }
-
-  .btn.loading {
-    pointer-events: none;
-    opacity: 0.7;
-  }
-
-  .btn-back {
-    width: 100%;
-    padding: 9px;
-    background: transparent;
-    border: 1px solid rgba(0,229,255,0.2);
-    color: var(--text-muted);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-    letter-spacing: 3px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-top: 10px;
-    text-transform: uppercase;
-  }
-
-  .btn-back:hover {
-    border-color: var(--cyan);
-    color: var(--cyan);
-  }
-
-  .msg {
-    margin-top: 16px;
-    padding: 12px 14px;
-    border-radius: 4px;
-    font-size: 13px;
-    letter-spacing: 1px;
-    text-align: center;
-    display: none;
-    font-family: 'Share Tech Mono', monospace;
-  }
-
-  .msg.error {
-    background: rgba(255,77,77,0.1);
-    border: 1px solid rgba(255,77,77,0.4);
-    color: var(--red);
-    display: block;
-  }
-
-  .msg.success {
-    background: rgba(0,255,179,0.08);
-    border: 1px solid rgba(0,255,179,0.35);
-    color: var(--green);
-    display: block;
-  }
-
-  /* Success state */
-  .success-panel {
-    display: none;
-    text-align: center;
-    padding: 10px 0;
-  }
-
-  .success-icon {
-    font-size: 48px;
-    margin-bottom: 16px;
-    animation: pulse-green 2s infinite;
-  }
-
-  @keyframes pulse-green {
-    0%, 100% { text-shadow: 0 0 10px var(--green); }
-    50% { text-shadow: 0 0 25px var(--green), 0 0 50px var(--green); }
-  }
-
-  .success-panel h3 {
-    font-size: 18px;
-    letter-spacing: 3px;
-    color: var(--green);
-    margin-bottom: 10px;
-  }
-
-  .success-panel p {
-    font-size: 13px;
-    color: var(--text-muted);
-    line-height: 1.6;
-    font-family: 'Share Tech Mono', monospace;
-  }
-
-  .progress-bar {
-    height: 2px;
-    background: rgba(0,229,255,0.1);
-    border-radius: 2px;
-    margin-top: 20px;
-    overflow: hidden;
-    display: none;
-  }
-
-  .progress-bar.active { display: block; }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--cyan);
-    width: 0%;
-    transition: width 0.1s linear;
-    box-shadow: 0 0 8px var(--cyan);
-  }
-
-  .note {
-    font-size: 11px;
-    color: var(--text-muted);
-    font-family: 'Share Tech Mono', monospace;
-    text-align: center;
-    margin-top: 18px;
-    letter-spacing: 1px;
-    line-height: 1.6;
-  }
-
-  .note a {
-    color: var(--cyan);
-    text-decoration: none;
-  }
+  .box-footer { margin-top:18px; padding-top:14px; border-top:1px solid rgba(0,229,255,0.06); display:flex; justify-content:space-between; align-items:center; }
+  .box-footer span { font-family:var(--mono); font-size:8px; color:var(--muted); letter-spacing:1.5px; text-transform:uppercase; }
+  #clockSmall { color:rgba(0,229,255,0.4); }
 </style>
 </head>
 <body>
-
-<div class="titulo">NAYAR</div>
-<div class="subtitulo">SISTEMA DE CONTROL DE ACCESO</div>
-
-<div class="panel" id="mainPanel">
-
-  <!-- Formulario -->
-  <div id="formSection">
-    <div class="panel-header">
-      <span class="icon">🔐</span>
-      <h2>Solicitar Acceso</h2>
+<canvas id="bg"></canvas>
+<div class="wrapper">
+  <div class="brand">
+    <div class="brand-hex">
+      <svg width="52" height="52" viewBox="0 0 44 44">
+        <polygon points="22,3 39,12.5 39,31.5 22,41 5,31.5 5,12.5"  fill="none" stroke="#00e5ff" stroke-width="1.2" opacity="0.5"/>
+        <polygon points="22,8 34,15 34,29 22,36 10,29 10,15"         fill="none" stroke="#00e5ff" stroke-width="0.7" opacity="0.25"/>
+        <polygon points="22,13 29,17 29,25 22,29 15,25 15,17"        fill="none" stroke="#00e5ff" stroke-width="0.5" opacity="0.15"/>
+        <circle cx="22" cy="22" r="3.5" fill="#00e5ff" opacity="0.9"/>
+        <circle cx="22" cy="22" r="6"   fill="none" stroke="#00e5ff" stroke-width="0.5" opacity="0.3"/>
+      </svg>
     </div>
-
-    <div class="field">
-      <label>Tu nombre</label>
-      <input type="text" id="nombre" placeholder="Nombre completo" autocomplete="off">
-    </div>
-
-    <div class="field">
-      <label>Tu correo electrónico</label>
-      <input type="email" id="correo" placeholder="usuario@dominio.com" autocomplete="off">
-    </div>
-
-    <div class="field">
-      <label>Motivo de la solicitud</label>
-      <textarea id="motivo" placeholder="Describe brevemente por qué necesitas acceso al sistema..."></textarea>
-    </div>
-
-    <div class="progress-bar" id="progressBar">
-      <div class="progress-fill" id="progressFill"></div>
-    </div>
-
-    <button class="btn" id="btnEnviar" onclick="enviarSolicitud()">
-      ▶ ENVIAR SOLICITUD AL ADMINISTRADOR
-    </button>
-
-    <button class="btn-back" onclick="window.location.href='index.html'">
-      ← VOLVER AL ACCESO
-    </button>
-
-    <div class="msg" id="msg"></div>
-
-    <p class="note">La solicitud será enviada a<br><a href="mailto:ramblaalvaro@gmail.com">ramblaalvaro@gmail.com</a></p>
+    <h1>NAYAR</h1>
+    <div class="brand-sub">Inteligencia Espacial · WiFi Sniffing · v2.0</div>
   </div>
 
-  <!-- Éxito -->
-  <div class="success-panel" id="successSection">
-    <div class="success-icon">✔</div>
-    <h3>SOLICITUD ENVIADA</h3>
-    <p>Tu petición ha sido transmitida al<br>administrador del sistema.<br><br>
-    Recibirás confirmación en tu correo<br>cuando el acceso sea concedido.</p>
-    <button class="btn-back" style="margin-top:28px;" onclick="window.location.href='index.html'">
-      ← VOLVER AL ACCESO
-    </button>
-  </div>
+  <div class="panel" id="panel">
+    <span class="corner-tr"></span><span class="corner-bl"></span>
 
+    <!-- Formulario -->
+    <div id="formSection">
+      <div class="box-header">
+        <div class="box-status-dot"></div>
+        <span class="box-title">Solicitar acceso</span>
+        <span class="box-id">SYS-REQ-01</span>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="nombre">Nombre completo</label>
+        <div class="field-input-wrap">
+          <span class="field-icon">›_</span>
+          <input type="text" id="nombre" placeholder="Tu nombre" spellcheck="false">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="correo">Tu correo electrónico</label>
+        <div class="field-input-wrap">
+          <span class="field-icon">@</span>
+          <input type="email" id="correo" placeholder="usuario@dominio.com">
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label" for="motivo">Motivo de la solicitud</label>
+        <div class="field-input-wrap">
+          <textarea id="motivo" style="padding-left:12px" placeholder="Describe brevemente por qué necesitas acceso..."></textarea>
+        </div>
+      </div>
+
+      <button class="btn-submit" id="btnEnviar" onclick="enviar()">
+        <span>▶ ENVIAR SOLICITUD</span>
+      </button>
+      <button class="btn-back" onclick="window.location.href='index.html'">← VOLVER AL ACCESO</button>
+      <div class="error-msg" id="errorMsg"></div>
+
+      <div class="box-footer">
+        <span>NAYAR SECURE ACCESS</span>
+        <span id="clockSmall">--:--:--</span>
+      </div>
+    </div>
+
+    <!-- Éxito -->
+    <div class="success-section" id="successSection">
+      <div class="success-icon">✔</div>
+      <h3>SOLICITUD ENVIADA</h3>
+      <p>Tu petición ha sido transmitida al<br>administrador del sistema.<br><br>
+      Recibirás respuesta en tu correo<br>cuando el acceso sea concedido.</p>
+      <button class="btn-back" style="margin-top:28px" onclick="window.location.href='index.html'">← VOLVER AL ACCESO</button>
+    </div>
+  </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-  // ─── EmailJS ──────────────────────────────────────────────────────────────
-  // Usamos EmailJS (plan gratuito) para enviar el correo directamente
-  // desde el navegador sin backend.
-  // Pasos para activarlo:
-  //   1. Crea cuenta en https://www.emailjs.com
-  //   2. Crea un "Email Service" (Gmail) y apunta el Service ID abajo.
-  //   3. Crea un "Email Template" con variables {{nombre}}, {{correo}}, {{motivo}}
-  //      y apunta el Template ID abajo.
-  //   4. Copia tu Public Key y ponla abajo.
-  // ─────────────────────────────────────────────────────────────────────────
+  emailjs.init({ publicKey: 'TkhtxbHvWawCe1sz7' });
 
-  const EMAILJS_PUBLIC_KEY  = "TU_PUBLIC_KEY";   // ← reemplaza
-  const EMAILJS_SERVICE_ID  = "TU_SERVICE_ID";   // ← reemplaza
-  const EMAILJS_TEMPLATE_ID = "TU_TEMPLATE_ID";  // ← reemplaza
+  (function(){ const el=document.getElementById('clockSmall'); setInterval(()=>{el.textContent=new Date().toTimeString().slice(0,8);},1000); })();
 
-  // Carga el SDK de EmailJS dinámicamente
   (function(){
-    const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js';
-    s.onload = () => emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
-    document.head.appendChild(s);
+    const canvas=document.getElementById('bg'), ctx=canvas.getContext('2d');
+    const GS=44,FADE=0.015,RADIUS=2; let W,H,nodes; const cellGlow=new Map();
+    window.addEventListener('mousemove',e=>{
+      const cx=Math.floor(e.clientX/GS),cy=Math.floor(e.clientY/GS);
+      for(let dx=-RADIUS;dx<=RADIUS;dx++) for(let dy=-RADIUS;dy<=RADIUS;dy++){
+        const d=Math.sqrt(dx*dx+dy*dy); if(d>RADIUS)continue;
+        const k=`${cx+dx},${cy+dy}`; cellGlow.set(k,Math.min(1,Math.max(cellGlow.get(k)||0,1-d/(RADIUS+1))));
+      }
+    });
+    function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; nodes=Array.from({length:55},()=>({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-0.5)*0.35,vy:(Math.random()-0.5)*0.35,r:Math.random()*1.4+0.4})); }
+    resize(); window.addEventListener('resize',resize);
+    function draw(){
+      ctx.clearRect(0,0,W,H);
+      for(const[k,v]of cellGlow){const n=v-FADE;if(n<=0.001)cellGlow.delete(k);else cellGlow.set(k,n);}
+      for(const[k,v]of cellGlow){
+        const[col,row]=k.split(',').map(Number),px=col*GS,py=row*GS;
+        if(px>W+GS||py>H+GS||px<-GS||py<-GS)continue;
+        const g=ctx.createRadialGradient(px+GS/2,py+GS/2,0,px+GS/2,py+GS/2,GS*0.8);
+        g.addColorStop(0,`rgba(0,229,255,${(v*0.18).toFixed(3)})`);g.addColorStop(0.5,`rgba(0,180,220,${(v*0.08).toFixed(3)})`);g.addColorStop(1,'rgba(0,100,160,0)');
+        ctx.fillStyle=g;ctx.fillRect(px,py,GS,GS);
+        ctx.strokeStyle=`rgba(0,229,255,${(v*0.35).toFixed(3)})`;ctx.lineWidth=0.8;ctx.strokeRect(px+.5,py+.5,GS-1,GS-1);
+      }
+      ctx.strokeStyle='rgba(0,229,255,0.04)';ctx.lineWidth=1;
+      for(let x=0;x<=W;x+=GS){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+      for(let y=0;y<=H;y+=GS){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+      for(let i=0;i<nodes.length;i++) for(let j=i+1;j<nodes.length;j++){
+        const dx=nodes[i].x-nodes[j].x,dy=nodes[i].y-nodes[j].y,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<110){ctx.strokeStyle=`rgba(0,229,255,${(0.07*(1-d/110)).toFixed(3)})`;ctx.lineWidth=0.5;ctx.beginPath();ctx.moveTo(nodes[i].x,nodes[i].y);ctx.lineTo(nodes[j].x,nodes[j].y);ctx.stroke();}
+      }
+      nodes.forEach(n=>{ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);ctx.fillStyle='rgba(0,229,255,0.3)';ctx.fill();n.x+=n.vx;n.y+=n.vy;if(n.x<0||n.x>W)n.vx*=-1;if(n.y<0||n.y>H)n.vy*=-1;});
+      requestAnimationFrame(draw);
+    }
+    draw();
   })();
 
-  // ─── Lógica del formulario ────────────────────────────────────────────────
-
-  function mostrarMsg(tipo, texto) {
-    const el = document.getElementById('msg');
-    el.className = 'msg ' + tipo;
-    el.textContent = texto;
-  }
-
-  function limpiarMsg() {
-    const el = document.getElementById('msg');
-    el.className = 'msg';
-    el.textContent = '';
-  }
-
-  function animarBarra(cb) {
-    const bar  = document.getElementById('progressBar');
-    const fill = document.getElementById('progressFill');
-    bar.classList.add('active');
-    fill.style.width = '0%';
-    let w = 0;
-    const iv = setInterval(() => {
-      w += 2;
-      fill.style.width = w + '%';
-      if (w >= 90) clearInterval(iv);
-    }, 40);
-    setTimeout(() => {
-      fill.style.width = '100%';
-      setTimeout(() => { bar.classList.remove('active'); cb(); }, 300);
-    }, 2200);
-  }
-
-  function mostrarExito() {
-    document.getElementById('formSection').style.display = 'none';
-    const s = document.getElementById('successSection');
-    s.style.display = 'block';
-    s.style.animation = 'none';
-  }
-
-  async function enviarSolicitud() {
-    limpiarMsg();
-
+  async function enviar() {
     const nombre = document.getElementById('nombre').value.trim();
     const correo = document.getElementById('correo').value.trim();
     const motivo = document.getElementById('motivo').value.trim();
+    const err    = document.getElementById('errorMsg');
+    const btn    = document.getElementById('btnEnviar');
 
-    if (!nombre) { mostrarMsg('error', 'CAMPO REQUERIDO: nombre'); return; }
-    if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) {
-      mostrarMsg('error', 'CORREO NO VÁLIDO'); return;
-    }
-    if (!motivo) { mostrarMsg('error', 'CAMPO REQUERIDO: motivo'); return; }
+    err.classList.remove('show'); err.textContent = '';
 
-    const btn = document.getElementById('btnEnviar');
+    if (!nombre) { err.textContent = '⚠ CAMPO REQUERIDO: NOMBRE'; err.classList.add('show'); return; }
+    if (!correo || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(correo)) { err.textContent = '⚠ CORREO NO VÁLIDO'; err.classList.add('show'); return; }
+    if (!motivo) { err.textContent = '⚠ CAMPO REQUERIDO: MOTIVO'; err.classList.add('show'); return; }
+
     btn.classList.add('loading');
-    btn.textContent = '⏳ TRANSMITIENDO...';
 
-    animarBarra(async () => {
-      try {
-        const templateParams = {
-          to_email : 'ramblaalvaro@gmail.com',
-          nombre   : nombre,
-          correo   : correo,
-          motivo   : motivo,
-          fecha    : new Date().toLocaleString('es-ES'),
-        };
-
-        await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams);
-        mostrarExito();
-
-      } catch (err) {
-        console.error(err);
-
-        // ── Modo demostración (sin EmailJS configurado) ──
-        // Si no tienes las claves aún, muestra el éxito de todas formas
-        // para que puedas ver el flujo completo.
-        if (
-          EMAILJS_PUBLIC_KEY  === "TU_PUBLIC_KEY" ||
-          EMAILJS_SERVICE_ID  === "TU_SERVICE_ID" ||
-          EMAILJS_TEMPLATE_ID === "TU_TEMPLATE_ID"
-        ) {
-          mostrarExito(); // demo sin credenciales reales
-        } else {
-          btn.classList.remove('loading');
-          btn.textContent = '▶ ENVIAR SOLICITUD AL ADMINISTRADOR';
-          mostrarMsg('error', 'ERROR DE TRANSMISIÓN — INTENTA DE NUEVO');
-        }
-      }
-    });
+    try {
+      await emailjs.send('nayar_service', 'template_itadp9d', {
+        nombre: nombre,
+        correo: correo,
+        motivo: motivo,
+        fecha:  new Date().toLocaleString('es-ES')
+      });
+      document.getElementById('formSection').style.display = 'none';
+      document.getElementById('successSection').style.display = 'block';
+    } catch(e) {
+      btn.classList.remove('loading');
+      err.textContent = '⚠ ERROR AL ENVIAR — INTENTA DE NUEVO';
+      err.classList.add('show');
+      console.error(e);
+    }
   }
 </script>
 </body>
