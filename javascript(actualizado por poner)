@@ -1,0 +1,241 @@
+/**
+ * NAYAR — Dashboard Inteligente v2.5
+ * Lógica de conversión RSSI -> Metros + Monitoreo de Aforo
+ */
+
+// ── CONFIGURACIÓN Y MAPEO ────────────────────────────
+const FIELD_MAP = {
+  field1: { label: 'Distancia Media', kpi: 'kpiDistance', unit: ' m' },
+  field2: { label: 'Dispositivos',    kpi: 'kpiDevices',  unit: '' },
+  field3: { label: 'Ocupación',       kpi: 'kpiOccupancy', unit: '%' },
+  field4: { label: 'RSSI Mínimo',     kpi: 'kpiMin',       unit: ' dBm' },
+  field5: { label: 'RSSI Máximo',     kpi: 'kpiMax',       unit: ' dBm' }
+};
+
+// ── ESTADO GLOBAL ─────────────────────────────────────
+let pollingTimer = null;
+let historyDist  = []; // Historial de distancia
+let historyDevs  = []; // Historial de dispositivos
+let historyTimes = [];
+
+/**
+ * FÓRMULA DE PROPAGACIÓN (Log-distance Path Loss Model)
+ * Convierte la potencia dBm en metros aproximados.
+ * n: 2.8 (entorno con algunos obstáculos)
+ * A: -42 (potencia medida a 1 metro de distancia)
+ */
+function rssiToMeters(rssi) {
+  if (!rssi || rssi >= 0) return 0;
+  const n = 2.8; 
+  const A = -42; 
+  const dist = Math.pow(10, (A - rssi) / (10 * n));
+  return parseFloat(dist.toFixed(1));
+}
+
+// ── LOG DEL SISTEMA ───────────────────────────────────
+function addLog(level, msg) {
+  const el = document.getElementById('logEntries');
+  const now = new Date().toLocaleTimeString('es-ES');
+  const div = document.createElement('div');
+  div.className = 'log-line';
+  div.innerHTML = `<span class="log-time">${now}</span>
+                   <span class="log-level-${level.toLowerCase()}">${level}</span>
+                   <span>${msg}</span>`;
+  el.prepend(div);
+}
+
+function clearLog() {
+  document.getElementById('logEntries').innerHTML = '';
+}
+
+// ── FETCH DATA DE THINGSPEAK ──────────────────────────
+async function fetchThingSpeak() {
+  const channelId = document.getElementById('channelId').value;
+  const apiKey    = document.getElementById('apiKey').value;
+  
+  const url = `https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${apiKey}&results=20`;
+
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error('Error en la respuesta de API');
+    const data = await res.json();
+    
+    if (data.feeds && data.feeds.length > 0) {
+      updateUI(data);
+      setOnline();
+    } else {
+      addLog('WARN', 'El canal no tiene datos aún.');
+    }
+  } catch (err) {
+    addLog('ERR', `Error de conexión: ${err.message}`);
+    setOffline();
+  }
+}
+
+// ── ACTUALIZACIÓN DE LA INTERFAZ ──────────────────────
+function updateUI(data) {
+  const feeds = data.feeds;
+  const last  = feeds[feeds.length - 1];
+  const prev  = feeds[feeds.length - 2] || last;
+
+  // 1. Actualizar KPIs básicos (Dispositivos y Ocupación)
+  document.getElementById('kpiDevices').innerText = last.field2 || 0;
+  document.getElementById('kpiOccupancy').innerText = (last.field3 || 0) + '%';
+  
+  // Barra de progreso visual si existe en el HTML
+  const bar = document.getElementById('barOccupancy');
+  if (bar) bar.style.width = (last.field3 || 0) + '%';
+
+  // 2. Cálculo de Metros (Field 1 es el RSSI promedio)
+  const rssiPromedio = parseFloat(last.field1);
+  const metros = rssiToMeters(rssiPromedio);
+  document.getElementById('kpiDistance').innerText = metros;
+
+  // Mostrar RSSI real en la tabla o sub-kpis si existen
+  if(document.getElementById('kpiMin')) document.getElementById('kpiMin').innerText = last.field4 || '—';
+  if(document.getElementById('kpiMax')) document.getElementById('kpiMax').innerText = last.field5 || '—';
+
+  // 3. Lógica de Proximidad (Colores y Estados)
+  const statusLabel = document.getElementById('statusText');
+  const dot = document.getElementById('statusDot');
+  
+  if (metros < 2.5) {
+    statusLabel.innerText = "PROXIMIDAD: INMEDIATA";
+    dot.className = "status-dot online"; // Verde
+  } else if (metros < 7) {
+    statusLabel.innerText = "PROXIMIDAD: MEDIA";
+    dot.className = "status-dot online"; 
+    dot.style.background = "var(--cyan)";
+  } else {
+    statusLabel.innerText = "PROXIMIDAD: LEJANA";
+    dot.className = "status-dot online";
+    dot.style.background = "var(--amber)";
+  }
+
+  // 4. Tendencia de Dispositivos
+  const trendEl = document.getElementById('trendDevices');
+  const diff = parseInt(last.field2) - parseInt(prev.field2);
+  if (diff > 0) {
+    trendEl.innerText = `▲ +${diff}`;
+    trendEl.style.color = "var(--red)";
+  } else if (diff < 0) {
+    trendEl.innerText = `▼ ${diff}`;
+    trendEl.style.color = "var(--green)";
+  } else {
+    trendEl.innerText = "● ESTABLE";
+    trendEl.style.color = "var(--muted)";
+  }
+
+  // 5. Historial para Gráficos
+  historyDist = feeds.map(f => rssiToMeters(parseFloat(f.field1)));
+  historyDevs = feeds.map(f => parseInt(f.field2) || 0);
+  historyTimes = feeds.map(f => new Date(f.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
+
+  renderTable(last);
+  drawCharts();
+  document.getElementById('lastUpdate').innerText = `ACTUALIZADO: ${new Date().toLocaleTimeString()}`;
+}
+
+// ── TABLA DE DATOS ────────────────────────────────────
+function renderTable(last) {
+  const tbody = document.getElementById('fieldsTableBody');
+  tbody.innerHTML = '';
+  
+  for (const [key, cfg] of Object.entries(FIELD_MAP)) {
+    let val = last[key] || '—';
+    // Si es el campo 1, mostramos la conversión en la tabla también
+    if (key === 'field1') val = `${rssiToMeters(parseFloat(val))} m (${val} dBm)`;
+    
+    tbody.innerHTML += `
+      <tr>
+        <td>${key.toUpperCase()}</td>
+        <td>${cfg.label}</td>
+        <td>${val}${key !== 'field1' ? cfg.unit : ''}</td>
+      </tr>`;
+  }
+}
+
+// ── GRÁFICOS (SVG) ────────────────────────────────────
+function drawCharts() {
+  const svgDist = document.getElementById('rssiChart'); // Usamos el mismo ID de antes
+  const svgDev  = document.getElementById('devChart');
+  
+  if (historyDist.length < 2) return;
+
+  // Dibujar gráfico de Distancia
+  svgDist.innerHTML = generateLinePath(historyDist, 0, 15, '#1a6cff');
+  // Dibujar gráfico de Dispositivos
+  svgDev.innerHTML = generateLinePath(historyDevs, 0, 20, '#6d28d9');
+}
+
+function generateLinePath(data, min, max, color) {
+  const width = 600;
+  const height = 180;
+  const step = width / (data.length - 1);
+  
+  let points = data.map((val, i) => {
+    const x = i * step;
+    const y = height - ((val - min) / (max - min)) * height;
+    return `${x},${y}`;
+  }).join(' ');
+
+  return `
+    <polyline points="${points}" fill="none" stroke="${color}" stroke-width="3" stroke-linecap="round" />
+    <path d="M ${points} L ${width},${height} L 0,${height} Z" fill="${color}" opacity="0.1" />
+  `;
+}
+
+// ── CONTROLES DE CONEXIÓN ─────────────────────────────
+function startPolling() {
+  const cId = document.getElementById('channelId').value;
+  if (!cId) {
+    addLog('ERR', 'Introduce un Channel ID válido.');
+    return;
+  }
+  
+  stopPolling();
+  // Guardar configuración
+  localStorage.setItem('nayar_cfg', JSON.stringify({
+    channelId: document.getElementById('channelId').value,
+    apiKey: document.getElementById('apiKey').value
+  }));
+
+  addLog('INFO', 'Iniciando monitoreo de NAYAR...');
+  fetchThingSpeak();
+  pollingTimer = setInterval(fetchThingSpeak, 20000); // Cada 20s
+}
+
+function stopPolling() {
+  if (pollingTimer) {
+    clearInterval(pollingTimer);
+    pollingTimer = null;
+    setOffline();
+    addLog('INFO', 'Sistema detenido.');
+  }
+}
+
+function setOnline() {
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  dot.classList.add('online');
+  dot.classList.remove('offline');
+}
+
+function setOffline() {
+  const dot = document.getElementById('statusDot');
+  const txt = document.getElementById('statusText');
+  dot.classList.remove('online');
+  dot.classList.add('offline');
+  txt.innerText = "SIN CONEXIÓN";
+}
+
+// ── INIT ──────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('nayar_cfg');
+  if (saved) {
+    const cfg = JSON.parse(saved);
+    document.getElementById('channelId').value = cfg.channelId || '';
+    document.getElementById('apiKey').value = cfg.apiKey || '';
+    addLog('INFO', 'Configuración cargada de la sesión anterior.');
+  }
+});
