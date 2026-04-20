@@ -33,6 +33,91 @@
   --office-d: rgba(13,144,101,0.08);
 }
 
+/* ── DARK MODE ── */
+[data-theme="dark"] {
+  --black:    #0e0e12;
+  --ink:      #13131a;
+  --panel:    #1a1a24;
+  --panel2:   #16161f;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.14);
+  --text:     rgba(240,235,224,0.90);
+  --muted:    rgba(240,235,224,0.40);
+  --muted2:   rgba(240,235,224,0.65);
+}
+[data-theme="dark"] nav {
+  background: rgba(14,14,18,0.92);
+}
+[data-theme="dark"] .nav-wordmark,
+[data-theme="dark"] .hero-title,
+[data-theme="dark"] .section-title,
+[data-theme="dark"] .sector-big-title,
+[data-theme="dark"] .tech-cell-title,
+[data-theme="dark"] .cta-title,
+[data-theme="dark"] .how-step-title,
+[data-theme="dark"] .plan-name,
+[data-theme="dark"] .modal-title,
+[data-theme="dark"] .success-title,
+[data-theme="dark"] .footer-brand .logo-wordmark {
+  color: rgba(240,235,224,0.95) !important;
+}
+[data-theme="dark"] .how-step-num { color: rgba(240,235,224,0.15) !important; }
+[data-theme="dark"] .btn-ghost:hover { color: rgba(240,235,224,0.95); border-color: rgba(240,235,224,0.4); }
+[data-theme="dark"] .modal-close:hover { color: rgba(240,235,224,0.95); }
+[data-theme="dark"] .footer-links-col ul a:hover { color: rgba(240,235,224,0.95); }
+
+/* ── NAV CONTROLS (theme + lang) ── */
+.nav-controls {
+  display: flex; align-items: center; gap: 8px;
+}
+
+.theme-toggle {
+  width: 36px; height: 36px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted2);
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.2s, border-color 0.2s, background 0.2s;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+
+.lang-switcher {
+  display: flex;
+  border: 1px solid var(--border2);
+  overflow: hidden;
+}
+.lang-btn {
+  padding: 0 11px;
+  height: 36px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: color 0.2s, background 0.2s;
+  border-right: 1px solid var(--border2);
+}
+.lang-btn:last-child { border-right: none; }
+.lang-btn.active {
+  background: var(--gold);
+  color: #000;
+  font-weight: 500;
+}
+.lang-btn:not(.active):hover {
+  color: var(--gold);
+  background: var(--gold-dim);
+}
+
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
 
@@ -1003,11 +1088,20 @@ footer {
     <span class="nav-wordmark">NAYAR</span>
   </a>
   <ul class="nav-links">
-    <li><a href="#how">Cómo funciona</a></li>
-    <li><a href="#sectores">Sectores</a></li>
-    <li><a href="#tecnologia">Tecnología</a></li>
+    <li><a href="#how" data-i18n="nav_how">Cómo funciona</a></li>
+    <li><a href="#sectores" data-i18n="nav_sectors">Sectores</a></li>
+    <li><a href="#tecnologia" data-i18n="nav_tech">Tecnología</a></li>
   </ul>
-  <a href="#sectores" class="nav-cta">Ver planes</a>
+  <div class="nav-controls">
+    <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema" title="Modo oscuro / claro">
+      <span id="themeIcon">🌙</span>
+    </button>
+    <div class="lang-switcher">
+      <button class="lang-btn active" id="btnEs" onclick="setLang('es')">ES</button>
+      <button class="lang-btn" id="btnEn" onclick="setLang('en')">EN</button>
+    </div>
+    <a href="#sectores" class="nav-cta" data-i18n="nav_cta">Ver planes</a>
+  </div>
 </nav>
 
 <!-- HERO -->
@@ -1349,6 +1443,476 @@ footer {
     </div>
   </div>
 </div>
+
+<!-- ── THEME & LANGUAGE SCRIPT ── -->
+<script>
+// ── THEME ──
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon   = document.getElementById('themeIcon');
+const saved = localStorage.getItem('nayar_theme') || 'light';
+document.documentElement.setAttribute('data-theme', saved);
+themeIcon.textContent = saved === 'dark' ? '☀️' : '🌙';
+
+themeToggle.addEventListener('click', () => {
+  const curr = document.documentElement.getAttribute('data-theme');
+  const next = curr === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('nayar_theme', next);
+  themeIcon.textContent = next === 'dark' ? '☀️' : '🌙';
+});
+
+// ── TRANSLATIONS ──
+const translations = {
+  es: {
+    nav_how:    'Cómo funciona',
+    nav_sectors:'Sectores',
+    nav_tech:   'Tecnología',
+    nav_cta:    'Ver planes',
+    hero_eyebrow: 'Inteligencia Espacial · WiFi Sniffing',
+    hero_sub:   'Espacios que piensan',
+    hero_desc:  'Convertimos señales WiFi en conocimiento estratégico. Aforo en tiempo real, comportamiento de clientes y optimización energética — sin cámaras, sin fricciones, sin infraestructura compleja.',
+    hero_btn1:  'Explorar planes',
+    hero_btn2:  'Cómo funciona',
+    stat1_lbl:  'Sectores',
+    stat2_lbl:  'Métricas WiFi',
+    stat3_lbl:  'Actualización',
+    stat4_lbl:  'Cámaras',
+    how_label:  'Proceso',
+    how_title:  'CÓMO FUNCIONA',
+    how_sub:    'Cuatro pasos desde la señal WiFi hasta la decisión de negocio.',
+    step1_title:'CAPTURA',
+    step1_desc: 'La Raspberry Pi escanea pasivamente las tramas WiFi de los dispositivos presentes en el espacio, sin necesidad de conexión ni consentimiento activo.',
+    step2_title:'ANÁLISIS',
+    step2_desc: 'Procesamiento en tiempo real: RSSI, conteo de dispositivos únicos, estimación de ocupación, detección de zonas activas e índice energético.',
+    step3_title:'TRANSMISIÓN',
+    step3_desc: 'Los datos se envían a ThingSpeak cada 30 segundos vía MQTT, almacenándose en la nube con histórico completo y API abierta.',
+    step4_title:'DASHBOARD',
+    step4_desc: 'Visualización en tiempo real desde cualquier dispositivo. KPIs, gráficos históricos, alertas y campos personalizados según tu sector.',
+    sectors_label: 'Planes por sector',
+    sectors_title: 'TU SECTOR,<br>TUS MÉTRICAS',
+    sectors_sub: 'Cada industria tiene sus propias preguntas. NAYAR ofrece campos y dashboards diseñados específicamente para los retos de cada sector.',
+    tab1_name:  'HOSTELERÍA & RETAIL',
+    tab1_sub:   'Restaurantes · Tiendas · Hoteles',
+    tab2_name:  'OFICINAS',
+    tab2_sub:   'Coworking · Corporativo',
+    retail_title:'HOSTELERÍA<br>& RETAIL',
+    retail_desc:'Conoce el comportamiento real de tus clientes. Mide el flujo de visitas, detecta picos de demanda y optimiza la operación de tu local con datos objetivos en tiempo real.',
+    retail_uc1: 'Restaurantes y bares',
+    retail_uc2: 'Hoteles y lobbies',
+    retail_uc3: 'Tiendas de moda y calzado',
+    retail_uc4: 'Supermercados y grandes almacenes',
+    retail_uc5: 'Centros comerciales',
+    plan_tier:  'Funcionalidades incluidas',
+    plan_badge: 'Plan único',
+    retail_plan_name: 'HOSTELERÍA<br>+ RETAIL',
+    retail_f1:  'Funcionalidad — análisis de presencia y flujo de clientes',
+    retail_f2:  'Dispositivos Detectados — aforo en tiempo real',
+    retail_f3:  'Ocupación en tiempo real — % sobre aforo máximo',
+    retail_f4:  'Clientes diarios — conteo acumulado por jornada',
+    retail_f5:  'Tendencia semanal de uso — evolución día a día',
+    retail_f6:  'Clientes por hora — distribución horaria del tráfico',
+    office_title:'OFICINAS<br>& COWORKING',
+    office_desc:'Optimiza el uso de tus espacios corporativos. Reduce costes energéticos, mejora la asignación de salas y diseña políticas de trabajo híbrido con datos reales.',
+    office_uc1: 'Oficinas corporativas',
+    office_uc2: 'Espacios de coworking',
+    office_uc3: 'Campus universitarios',
+    office_uc4: 'Edificios de uso mixto',
+    office_uc5: 'Sedes gubernamentales',
+    office_plan_name: 'OFICINAS',
+    office_f1:  'Tiempo medio de estancia — duración promedio de visitas por zona',
+    office_f2:  'Mejora el uso del espacio y reduce costes operativos',
+    office_f3:  'Dispositivos Detectados — empleados presentes en tiempo real',
+    office_f4:  'Ocupación en tiempo real — % de escritorios y salas en uso',
+    office_f5:  'Tendencia semanal de uso — evolución de ocupación día a día',
+    plan_btn:   'Solicitar demo',
+    tech_label: 'Tecnología',
+    tech_title: 'STACK TÉCNICO',
+    tech_sub:   'Hardware asequible, software robusto. Infraestructura desplegable en menos de una hora.',
+    tech1_title:'RASPBERRY PI',
+    tech1_desc: 'Sensor de bajo coste corriendo Ubuntu Server. El script Python captura tramas WiFi en modo monitor, procesa las métricas y las envía vía MQTT a ThingSpeak cada 30 segundos.',
+    tech1_tag:  'Hardware · Edge computing',
+    tech2_title:'THINGSPEAK',
+    tech2_desc: 'Backend IoT en la nube de MathWorks. Recibe, almacena y expone los datos via REST API con retención configurable. Compatible con MATLAB Analytics para clientes avanzados.',
+    tech2_tag:  'Cloud · IoT backend',
+    tech3_title:'WIFI SNIFFING',
+    tech3_desc: 'Captura pasiva de probe requests en modo monitor. No requiere que los dispositivos estén conectados. Detecta presencia por la emisión natural de señales 802.11.',
+    tech3_tag:  'RF · 802.11 passive scan',
+    tech4_title:'DASHBOARD WEB',
+    tech4_desc: 'Frontend 100% estático alojado en GitHub Pages. Sin servidores propios, sin mantenimiento de backend. Actualización automática cada 30s vía fetch a la API de ThingSpeak.',
+    tech4_tag:  'Frontend · GitHub Pages',
+    cta_pre:    'Empieza hoy',
+    cta_title:  'TU ESPACIO<br>TIENE DATOS',
+    cta_sub:    'Instala, conecta y obtén tu primer insight en menos de una hora.',
+    cta_btn1:   'Ver planes por sector',
+    cta_btn2:   'Abrir dashboard demo →',
+    footer_sub: 'Inteligencia Espacial · WiFi Sniffing · v2.0',
+    footer_s1:  'Sectores',
+    footer_s1a: 'Hostelería & Retail',
+    footer_s1b: 'Oficinas & Coworking',
+    footer_p1:  'Producto',
+    footer_p1a: 'Cómo funciona',
+    footer_p1b: 'Stack técnico',
+    footer_p1c: 'Dashboard demo',
+    footer_t1:  'Tecnología',
+    footer_copy:'© 2025 NAYAR · Inteligencia Espacial',
+    footer_pwr: 'Powered by WiFi Sniffing · ThingSpeak · Raspberry Pi',
+    modal_eyebrow: 'Solicitar demo',
+    modal_title: 'HABLEMOS',
+    f_nombre_lbl:'Nombre *',
+    f_nombre_ph: 'Tu nombre',
+    f_email_lbl: 'Email *',
+    f_email_ph:  'tu@empresa.com',
+    f_empresa_lbl:'Empresa *',
+    f_empresa_ph:'Nombre de empresa',
+    f_sector_lbl:'Sector *',
+    f_sector_ph: 'Seleccionar…',
+    f_hosp:      'Hostelería',
+    f_retail:    'Retail',
+    f_hotel:     'Hotel',
+    f_oficinas:  'Oficinas',
+    f_coworking: 'Coworking',
+    f_cc:        'Centro comercial',
+    f_otro:      'Otro',
+    f_mensaje_lbl:'Mensaje',
+    f_mensaje_ph:'Cuéntanos sobre tu espacio, número de locales, dudas…',
+    f_submit:    'Enviar solicitud',
+    success_title:'SOLICITUD ENVIADA',
+    success_sub: 'Hemos recibido tu solicitud.<br>Nos pondremos en contacto contigo en menos de 24h.<br><br><strong>nayarcompanyservices@gmail.com</strong>',
+  },
+  en: {
+    nav_how:    'How it works',
+    nav_sectors:'Sectors',
+    nav_tech:   'Technology',
+    nav_cta:    'View plans',
+    hero_eyebrow: 'Spatial Intelligence · WiFi Sniffing',
+    hero_sub:   'Spaces that think',
+    hero_desc:  'We turn WiFi signals into strategic knowledge. Real-time occupancy, customer behaviour and energy optimisation — no cameras, no friction, no complex infrastructure.',
+    hero_btn1:  'Explore plans',
+    hero_btn2:  'How it works',
+    stat1_lbl:  'Sectors',
+    stat2_lbl:  'WiFi Metrics',
+    stat3_lbl:  'Update rate',
+    stat4_lbl:  'Cameras',
+    how_label:  'Process',
+    how_title:  'HOW IT WORKS',
+    how_sub:    'Four steps from WiFi signal to business decision.',
+    step1_title:'CAPTURE',
+    step1_desc: 'The Raspberry Pi passively scans WiFi frames from devices present in the space, with no connection or active consent required.',
+    step2_title:'ANALYSIS',
+    step2_desc: 'Real-time processing: RSSI, unique device count, occupancy estimation, active zone detection and energy index.',
+    step3_title:'TRANSMISSION',
+    step3_desc: 'Data is sent to ThingSpeak every 30 seconds via MQTT, stored in the cloud with full history and open API.',
+    step4_title:'DASHBOARD',
+    step4_desc: 'Real-time visualisation from any device. KPIs, historical charts, alerts and custom fields tailored to your sector.',
+    sectors_label: 'Plans by sector',
+    sectors_title: 'YOUR SECTOR,<br>YOUR METRICS',
+    sectors_sub: 'Every industry has its own questions. NAYAR offers fields and dashboards designed specifically for each sector\'s challenges.',
+    tab1_name:  'HOSPITALITY & RETAIL',
+    tab1_sub:   'Restaurants · Shops · Hotels',
+    tab2_name:  'OFFICES',
+    tab2_sub:   'Coworking · Corporate',
+    retail_title:'HOSPITALITY<br>& RETAIL',
+    retail_desc:'Understand your customers\' real behaviour. Measure visitor flow, detect demand peaks and optimise your venue\'s operation with objective real-time data.',
+    retail_uc1: 'Restaurants and bars',
+    retail_uc2: 'Hotels and lobbies',
+    retail_uc3: 'Fashion and footwear stores',
+    retail_uc4: 'Supermarkets and department stores',
+    retail_uc5: 'Shopping centres',
+    plan_tier:  'Included features',
+    plan_badge: 'Single plan',
+    retail_plan_name: 'HOSPITALITY<br>+ RETAIL',
+    retail_f1:  'Feature — presence and customer flow analysis',
+    retail_f2:  'Detected Devices — real-time occupancy count',
+    retail_f3:  'Real-time occupancy — % of maximum capacity',
+    retail_f4:  'Daily customers — accumulated count per session',
+    retail_f5:  'Weekly usage trend — day-by-day evolution',
+    retail_f6:  'Customers per hour — hourly traffic distribution',
+    office_title:'OFFICES<br>& COWORKING',
+    office_desc:'Optimise the use of your corporate spaces. Reduce energy costs, improve room allocation and design hybrid work policies with real data.',
+    office_uc1: 'Corporate offices',
+    office_uc2: 'Coworking spaces',
+    office_uc3: 'University campuses',
+    office_uc4: 'Mixed-use buildings',
+    office_uc5: 'Government buildings',
+    office_plan_name: 'OFFICES',
+    office_f1:  'Average dwell time — average visit duration per zone',
+    office_f2:  'Improve space utilisation and reduce operational costs',
+    office_f3:  'Detected Devices — employees present in real time',
+    office_f4:  'Real-time occupancy — % of desks and rooms in use',
+    office_f5:  'Weekly usage trend — occupancy evolution day by day',
+    plan_btn:   'Request demo',
+    tech_label: 'Technology',
+    tech_title: 'TECH STACK',
+    tech_sub:   'Affordable hardware, robust software. Infrastructure deployable in under an hour.',
+    tech1_title:'RASPBERRY PI',
+    tech1_desc: 'Low-cost sensor running Ubuntu Server. The Python script captures WiFi frames in monitor mode, processes metrics and sends them via MQTT to ThingSpeak every 30 seconds.',
+    tech1_tag:  'Hardware · Edge computing',
+    tech2_title:'THINGSPEAK',
+    tech2_desc: 'IoT backend on MathWorks cloud. Receives, stores and exposes data via REST API with configurable retention. Compatible with MATLAB Analytics for advanced clients.',
+    tech2_tag:  'Cloud · IoT backend',
+    tech3_title:'WIFI SNIFFING',
+    tech3_desc: 'Passive capture of probe requests in monitor mode. Does not require devices to be connected. Detects presence through the natural emission of 802.11 signals.',
+    tech3_tag:  'RF · 802.11 passive scan',
+    tech4_title:'WEB DASHBOARD',
+    tech4_desc: '100% static frontend hosted on GitHub Pages. No own servers, no backend maintenance. Automatic update every 30s via fetch to the ThingSpeak API.',
+    tech4_tag:  'Frontend · GitHub Pages',
+    cta_pre:    'Start today',
+    cta_title:  'YOUR SPACE<br>HAS DATA',
+    cta_sub:    'Install, connect and get your first insight in under an hour.',
+    cta_btn1:   'View plans by sector',
+    cta_btn2:   'Open demo dashboard →',
+    footer_sub: 'Spatial Intelligence · WiFi Sniffing · v2.0',
+    footer_s1:  'Sectors',
+    footer_s1a: 'Hospitality & Retail',
+    footer_s1b: 'Offices & Coworking',
+    footer_p1:  'Product',
+    footer_p1a: 'How it works',
+    footer_p1b: 'Tech stack',
+    footer_p1c: 'Demo dashboard',
+    footer_t1:  'Technology',
+    footer_copy:'© 2025 NAYAR · Spatial Intelligence',
+    footer_pwr: 'Powered by WiFi Sniffing · ThingSpeak · Raspberry Pi',
+    modal_eyebrow: 'Request demo',
+    modal_title: 'LET\'S TALK',
+    f_nombre_lbl:'Name *',
+    f_nombre_ph: 'Your name',
+    f_email_lbl: 'Email *',
+    f_email_ph:  'you@company.com',
+    f_empresa_lbl:'Company *',
+    f_empresa_ph:'Company name',
+    f_sector_lbl:'Sector *',
+    f_sector_ph: 'Select…',
+    f_hosp:      'Hospitality',
+    f_retail:    'Retail',
+    f_hotel:     'Hotel',
+    f_oficinas:  'Offices',
+    f_coworking: 'Coworking',
+    f_cc:        'Shopping centre',
+    f_otro:      'Other',
+    f_mensaje_lbl:'Message',
+    f_mensaje_ph:'Tell us about your space, number of venues, questions…',
+    f_submit:    'Send request',
+    success_title:'REQUEST SENT',
+    success_sub: 'We have received your request.<br>We will get back to you within 24 hours.<br><br><strong>nayarcompanyservices@gmail.com</strong>',
+  }
+};
+
+function applyLang(lang) {
+  const t = translations[lang];
+  const set = (sel, key, attr) => {
+    const el = document.querySelector(sel);
+    if (!el) return;
+    if (attr === 'placeholder') el.placeholder = t[key];
+    else if (attr === 'html') el.innerHTML = t[key];
+    else el.textContent = t[key];
+  };
+
+  // Nav
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key] !== undefined) {
+      if (el.innerHTML.includes('<')) el.innerHTML = t[key];
+      else el.textContent = t[key];
+    }
+  });
+
+  // Hero
+  set('.hero-eyebrow', 'hero_eyebrow', 'text');
+  set('.hero-title-sub', 'hero_sub', 'text');
+  set('.hero-desc', 'hero_desc', 'text');
+  const heroBtns = document.querySelectorAll('.hero-actions a');
+  if (heroBtns[0]) heroBtns[0].childNodes[0].textContent = t.hero_btn1 + ' ';
+  if (heroBtns[1]) heroBtns[1].textContent = t.hero_btn2;
+
+  // Stats
+  const statLabels = document.querySelectorAll('.hero-stat-label');
+  ['stat1_lbl','stat2_lbl','stat3_lbl','stat4_lbl'].forEach((k,i) => {
+    if (statLabels[i]) statLabels[i].textContent = t[k];
+  });
+
+  // How
+  const howLabel = document.querySelector('.how-section .section-label');
+  if (howLabel) howLabel.textContent = t.how_label;
+  set('.how-section .section-title', 'how_title', 'text');
+  set('.how-section .section-subtitle', 'how_sub', 'text');
+  const stepTitles = document.querySelectorAll('.how-step-title');
+  const stepDescs  = document.querySelectorAll('.how-step-desc');
+  ['step1_title','step2_title','step3_title','step4_title'].forEach((k,i) => {
+    if (stepTitles[i]) stepTitles[i].textContent = t[k];
+  });
+  ['step1_desc','step2_desc','step3_desc','step4_desc'].forEach((k,i) => {
+    if (stepDescs[i]) stepDescs[i].textContent = t[k];
+  });
+
+  // Sectors
+  const secLabel = document.querySelector('.sectors-section .section-label');
+  if (secLabel) secLabel.textContent = t.sectors_label;
+  const secTitle = document.querySelector('.sectors-section .section-title');
+  if (secTitle) secTitle.innerHTML = t.sectors_title;
+  const secSub = document.querySelector('.sectors-section .section-subtitle');
+  if (secSub) secSub.textContent = t.sectors_sub;
+
+  // Tabs
+  const tabs = document.querySelectorAll('.sector-tab');
+  if (tabs[0]) {
+    tabs[0].querySelector('.tab-sector-name').textContent = t.tab1_name;
+    tabs[0].querySelector('.tab-sector-sub').textContent  = t.tab1_sub;
+  }
+  if (tabs[1]) {
+    tabs[1].querySelector('.tab-sector-name').textContent = t.tab2_name;
+    tabs[1].querySelector('.tab-sector-sub').textContent  = t.tab2_sub;
+  }
+
+  // Retail panel
+  const retailPanel = document.querySelector('[data-sector-panel="retail"]');
+  if (retailPanel) {
+    retailPanel.querySelector('.sector-big-title').innerHTML = t.retail_title;
+    retailPanel.querySelector('.sector-desc').textContent    = t.retail_desc;
+    const lis = retailPanel.querySelectorAll('.sector-use-cases li');
+    ['retail_uc1','retail_uc2','retail_uc3','retail_uc4','retail_uc5'].forEach((k,i) => {
+      if (lis[i]) lis[i].textContent = t[k];
+    });
+    retailPanel.querySelector('.plan-featured-badge').textContent = t.plan_badge;
+    retailPanel.querySelector('.plan-tier').textContent           = t.plan_tier;
+    retailPanel.querySelector('.plan-name').innerHTML             = t.retail_plan_name;
+    const fli = retailPanel.querySelectorAll('.plan-fields li');
+    ['retail_f1','retail_f2','retail_f3','retail_f4','retail_f5','retail_f6'].forEach((k,i) => {
+      if (fli[i]) {
+        const dot = fli[i].querySelector('.field-dot');
+        fli[i].textContent = t[k];
+        if (dot) fli[i].prepend(dot);
+      }
+    });
+    retailPanel.querySelector('.plan-btn').textContent = t.plan_btn;
+  }
+
+  // Office panel
+  const officePanel = document.querySelector('[data-sector-panel="office"]');
+  if (officePanel) {
+    officePanel.querySelector('.sector-big-title').innerHTML = t.office_title;
+    officePanel.querySelector('.sector-desc').textContent    = t.office_desc;
+    const lis = officePanel.querySelectorAll('.sector-use-cases li');
+    ['office_uc1','office_uc2','office_uc3','office_uc4','office_uc5'].forEach((k,i) => {
+      if (lis[i]) lis[i].textContent = t[k];
+    });
+    officePanel.querySelector('.plan-featured-badge').textContent = t.plan_badge;
+    officePanel.querySelector('.plan-tier').textContent           = t.plan_tier;
+    officePanel.querySelector('.plan-name').textContent           = t.office_plan_name;
+    const fli = officePanel.querySelectorAll('.plan-fields li');
+    ['office_f1','office_f2','office_f3','office_f4','office_f5'].forEach((k,i) => {
+      if (fli[i]) {
+        const dot = fli[i].querySelector('.field-dot');
+        fli[i].textContent = t[k];
+        if (dot) fli[i].prepend(dot);
+      }
+    });
+    officePanel.querySelector('.plan-btn').textContent = t.plan_btn;
+  }
+
+  // Tech
+  const techLabel = document.querySelector('.tech-section .section-label');
+  if (techLabel) techLabel.textContent = t.tech_label;
+  set('.tech-section .section-title', 'tech_title', 'text');
+  set('.tech-section .section-subtitle', 'tech_sub', 'text');
+  const cells = document.querySelectorAll('.tech-cell');
+  const techKeys = [
+    {t:'tech1_title',d:'tech1_desc',tag:'tech1_tag'},
+    {t:'tech2_title',d:'tech2_desc',tag:'tech2_tag'},
+    {t:'tech3_title',d:'tech3_desc',tag:'tech3_tag'},
+    {t:'tech4_title',d:'tech4_desc',tag:'tech4_tag'},
+  ];
+  cells.forEach((cell, i) => {
+    if (techKeys[i]) {
+      cell.querySelector('.tech-cell-title').textContent = t[techKeys[i].t];
+      cell.querySelector('.tech-cell-desc').textContent  = t[techKeys[i].d];
+      cell.querySelector('.tech-cell-tag').textContent   = t[techKeys[i].tag];
+    }
+  });
+
+  // CTA
+  const ctaPre = document.querySelector('.cta-pre');
+  if (ctaPre) ctaPre.textContent = t.cta_pre;
+  const ctaTitle = document.querySelector('.cta-title');
+  if (ctaTitle) ctaTitle.innerHTML = t.cta_title;
+  set('.cta-sub', 'cta_sub', 'text');
+  const ctaBtns = document.querySelectorAll('.cta-actions a');
+  if (ctaBtns[0]) {
+    ctaBtns[0].childNodes[0].textContent = t.cta_btn1 + ' ';
+  }
+  if (ctaBtns[1]) ctaBtns[1].textContent = t.cta_btn2;
+
+  // Footer
+  const footerSub = document.querySelector('.footer-brand .logo-sub');
+  if (footerSub) footerSub.textContent = t.footer_sub;
+  const footerCols = document.querySelectorAll('.footer-links-col');
+  if (footerCols[0]) {
+    footerCols[0].querySelector('h4').textContent = t.footer_s1;
+    const links = footerCols[0].querySelectorAll('a');
+    if (links[0]) links[0].textContent = t.footer_s1a;
+    if (links[1]) links[1].textContent = t.footer_s1b;
+  }
+  if (footerCols[1]) {
+    footerCols[1].querySelector('h4').textContent = t.footer_p1;
+    const links = footerCols[1].querySelectorAll('a');
+    if (links[0]) links[0].textContent = t.footer_p1a;
+    if (links[1]) links[1].textContent = t.footer_p1b;
+    if (links[2]) links[2].textContent = t.footer_p1c;
+  }
+  if (footerCols[2]) {
+    footerCols[2].querySelector('h4').textContent = t.footer_t1;
+  }
+  const footerBottom = document.querySelectorAll('.footer-bottom span');
+  if (footerBottom[0]) footerBottom[0].textContent = t.footer_copy;
+
+  // Modal
+  set('.modal-eyebrow', 'modal_eyebrow', 'text');
+  const modalEyebrow = document.querySelector('.modal-eyebrow');
+  if (modalEyebrow) {
+    // preserve ::before pseudo via text node
+    modalEyebrow.textContent = t.modal_eyebrow;
+  }
+  set('.modal-title', 'modal_title', 'text');
+  const formLabels = document.querySelectorAll('.form-label');
+  const labelKeys = ['f_nombre_lbl','f_email_lbl','f_empresa_lbl','f_sector_lbl'];
+  formLabels.forEach((lbl, i) => { if (labelKeys[i] && t[labelKeys[i]]) lbl.textContent = t[labelKeys[i]]; });
+  const msgLabel = document.querySelector('.modal-form .form-group:last-of-type .form-label');
+  if (msgLabel) msgLabel.textContent = t.f_mensaje_lbl;
+  const fNombre  = document.getElementById('f_nombre');
+  const fEmail   = document.getElementById('f_email');
+  const fEmpresa = document.getElementById('f_empresa');
+  const fMensaje = document.getElementById('f_mensaje');
+  if (fNombre)  fNombre.placeholder  = t.f_nombre_ph;
+  if (fEmail)   fEmail.placeholder   = t.f_email_ph;
+  if (fEmpresa) fEmpresa.placeholder = t.f_empresa_ph;
+  if (fMensaje) fMensaje.placeholder = t.f_mensaje_ph;
+  const fSector = document.getElementById('f_sector');
+  if (fSector) {
+    const opts = fSector.querySelectorAll('option');
+    const optKeys = ['f_sector_ph','f_hosp','f_retail','f_hotel','f_oficinas','f_coworking','f_cc','f_otro'];
+    opts.forEach((opt, i) => { if (optKeys[i] && t[optKeys[i]]) opt.textContent = t[optKeys[i]]; });
+  }
+  const submitText = document.getElementById('submitText');
+  if (submitText) submitText.textContent = t.f_submit;
+  const successTitle = document.querySelector('.success-title');
+  const successSub   = document.querySelector('.success-sub');
+  if (successTitle) successTitle.textContent = t.success_title;
+  if (successSub)   successSub.innerHTML     = t.success_sub;
+
+  // Lang buttons
+  document.getElementById('btnEs').classList.toggle('active', lang === 'es');
+  document.getElementById('btnEn').classList.toggle('active', lang === 'en');
+
+  // html lang attr
+  document.documentElement.setAttribute('lang', lang);
+  localStorage.setItem('nayar_lang', lang);
+}
+
+window.setLang = function(lang) { applyLang(lang); };
+
+// Init language
+const savedLang = localStorage.getItem('nayar_lang') || 'es';
+if (savedLang !== 'es') applyLang(savedLang);
+</script>
 
 <!-- Firebase + Script -->
 <script type="module">
