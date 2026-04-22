@@ -201,6 +201,25 @@ nav {
   box-shadow: 0 0 24px var(--gold-glow);
 }
 
+.nav-contact-btn {
+  padding: 9px 20px;
+  background: transparent;
+  border: 1px solid var(--border2);
+  color: var(--muted2);
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.nav-contact-btn:hover {
+  color: var(--gold);
+  border-color: var(--gold);
+  background: var(--gold-dim);
+}
+
 /* ── HERO ── */
 .hero {
   position: relative; z-index: 1;
@@ -1116,6 +1135,7 @@ footer {
     <li><a href="#how" data-i18n="nav_how">Cómo funciona</a></li>
     <li><a href="#sectores" data-i18n="nav_sectors">Sectores</a></li>
     <li><a href="#tecnologia" data-i18n="nav_tech">Tecnología</a></li>
+    <li><a href="#" onclick="openModal(); return false;">Contacta con nosotros</a></li>
   </ul>
   <div class="nav-controls">
     <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema" title="Modo oscuro / claro">
@@ -1260,7 +1280,6 @@ footer {
               <li><span class="field-dot"></span>Tendencia semanal de uso — evolución día a día</li>
               <li><span class="field-dot"></span>Clientes por hora — distribución horaria del tráfico</li>
             </ul>
-            <button class="plan-btn">Solicitar demo</button>
           </div>
         </div>
       </div>
@@ -1293,11 +1312,6 @@ footer {
               <li><span class="field-dot"></span>Ocupación en tiempo real — % de escritorios y salas en uso</li>
               <li><span class="field-dot"></span>Tendencia semanal de uso — evolución de ocupación día a día</li>
             </ul>
-            <button class="plan-btn">Solicitar demo</button>
-            <a href="Oficinas_Coworking.html" class="plan-btn-dashboard">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
-              Ver dashboard
-            </a>
           </div>
         </div>
       </div>
