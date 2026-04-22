@@ -43,7 +43,7 @@ URL = "https://api.thingspeak.com/update"
 
 # ── AJUSTES ────────────────────────────────────────────────────────────
 INTERFACE    = "wlan0"
-MAX_CAPACITY = 20     # dispositivos = aforo 100%
+MAX_CAPACITY = 30     # dispositivos = aforo 100%
 ZONA_A_MAX   =  5.0   # metros — Zona A (Oficinas)
 ZONA_B_MAX   = 15.0   # metros — Zona B (Salas)
 VENTANA      = 10     # ciclos para promediar estancia
