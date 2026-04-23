@@ -1135,7 +1135,7 @@ footer {
     <li><a href="#how" data-i18n="nav_how">Cómo funciona</a></li>
     <li><a href="#sectores" data-i18n="nav_sectors">Sectores</a></li>
     <li><a href="#tecnologia" data-i18n="nav_tech">Tecnología</a></li>
-    <li><a href="#" onclick="openModal(); return false;">Contacta con nosotros</a></li>
+    <li><a href="#" onclick="openModal(); return false;" data-i18n="nav_contact">Contacta con nosotros</a></li>
   </ul>
   <div class="nav-controls">
     <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema" title="Modo oscuro / claro">
@@ -1511,6 +1511,7 @@ const translations = {
     nav_sectors:'Sectores',
     nav_tech:   'Tecnología',
     nav_cta:    'Ver planes',
+    nav_contact:'Contacta con nosotros',
     hero_eyebrow: 'Inteligencia Espacial · WiFi Sniffing',
     hero_sub:   'Espacios que piensan',
     hero_desc:  'Convertimos señales WiFi en conocimiento estratégico. Aforo en tiempo real, comportamiento de clientes y optimización energética — sin cámaras, sin fricciones, sin infraestructura compleja.',
@@ -1627,6 +1628,7 @@ const translations = {
     nav_sectors:'Sectors',
     nav_tech:   'Technology',
     nav_cta:    'View plans',
+    nav_contact:'Contact us',
     hero_eyebrow: 'Spatial Intelligence · WiFi Sniffing',
     hero_sub:   'Spaces that think',
     hero_desc:  'We turn WiFi signals into strategic knowledge. Real-time occupancy, customer behaviour and energy optimisation — no cameras, no friction, no complex infrastructure.',
@@ -1826,7 +1828,8 @@ function applyLang(lang) {
         if (dot) fli[i].prepend(dot);
       }
     });
-    retailPanel.querySelector('.plan-btn').textContent = t.plan_btn;
+    const retailPlanBtn = retailPanel.querySelector('.plan-btn');
+    if (retailPlanBtn) retailPlanBtn.textContent = t.plan_btn;
   }
 
   // Office panel
@@ -1849,7 +1852,8 @@ function applyLang(lang) {
         if (dot) fli[i].prepend(dot);
       }
     });
-    officePanel.querySelector('.plan-btn').textContent = t.plan_btn;
+    const officePlanBtn = officePanel.querySelector('.plan-btn');
+    if (officePlanBtn) officePlanBtn.textContent = t.plan_btn;
   }
 
   // Tech
