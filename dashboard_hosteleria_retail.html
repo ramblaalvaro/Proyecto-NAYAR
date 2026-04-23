@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NAYAR — Hostelería & Retail</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:           #dde1e8;
+      --bg2:          #e8ebf0;
+      --surface:      rgba(220,224,232,0.95);
+      --surface2:     #d4d8e2;
+      --border:       rgba(20,60,130,0.14);
+      --border2:      rgba(20,60,130,0.28);
+      --cyan:         #1a6cff;
+      --cyan-glow:    rgba(26,108,255,0.10);
+      --green:        #00a85e;
+      --amber:        #d97706;
+      --red:          #dc2626;
+      --orange:       #ea580c;
+      --orange-glow:  rgba(234,88,12,0.10);
+      --teal:         #0891b2;
+      --teal-glow:    rgba(8,145,178,0.10);
+      --indigo:       #4f46e5;
+      --indigo-glow:  rgba(79,70,229,0.10);
+      --white:        #111827;
+      --text:         rgba(17,24,39,0.82);
+      --muted:        rgba(17,24,39,0.48);
+      --mono:         'Space Mono', monospace;
+      --sans:         'Outfit', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; }
+
+    body {
+      background: var(--bg);
+      font-family: var(--sans);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; height: 62px;
+      background: rgba(221,225,232,0.94);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo-area { display: flex; align-items: center; gap: 12px; }
+
+    .logo-hex svg { display: block; animation: hexPulse 4s ease-in-out infinite; }
+    @keyframes hexPulse {
+      0%,100% { filter: drop-shadow(0 0 6px rgba(234,88,12,0.25)); }
+      50%      { filter: drop-shadow(0 0 14px rgba(234,88,12,0.50)); }
+    }
+
+    .logo-name { font-size: 22px; font-weight: 800; letter-spacing: 5px; color: var(--white); }
+    .logo-tagline { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .sector-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px;
+      background: rgba(234,88,12,0.10);
+      border: 1px solid rgba(234,88,12,0.30);
+      border-radius: 100px;
+      font-size: 12px; font-weight: 600;
+      color: var(--orange);
+      letter-spacing: 0.5px;
+    }
+
+    .header-right { display: flex; align-items: center; gap: 14px; }
+
+    .status-pill {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 13px; font-weight: 500; color: var(--text);
+    }
+
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .status-dot.online  { background: var(--green); box-shadow: 0 0 8px rgba(0,168,94,0.5); animation: blink 2s infinite; }
+    .status-dot.offline { background: rgba(17,24,39,0.22); }
+    @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+    .last-update { font-size: 12px; color: var(--muted); }
+
+    /* ── CONFIG BAR ── */
+    .config-bar {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 28px;
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+
+    .config-bar label { font-size: 13px; font-weight: 600; color: var(--text); white-space: nowrap; }
+
+    .config-bar input {
+      padding: 8px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: #111827; font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      width: 180px;
+    }
+    .config-bar input:focus { border-color: var(--orange); box-shadow: 0 0 0 3px var(--orange-glow); }
+
+    .config-hint {
+      font-size: 12px; color: var(--muted);
+      font-family: var(--mono);
+      margin-left: 4px;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 9px 20px;
+      border: 1px solid; border-radius: 8px;
+      font-family: var(--sans); font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; white-space: nowrap;
+    }
+    .btn-primary { background: var(--orange); border-color: var(--orange); color: #fff; }
+    .btn-primary:hover { background: #c2410c; border-color: #c2410c; box-shadow: 0 0 18px rgba(234,88,12,0.30); }
+    .btn-secondary { background: transparent; border-color: rgba(17,24,39,0.22); color: var(--text); }
+    .btn-secondary:hover { background: var(--surface2); border-color: rgba(234,88,12,0.30); color: var(--orange); }
+
+    /* ── MAIN ── */
+    main { padding: 28px 28px 48px; max-width: 1400px; margin: 0 auto; }
+
+    /* ── ERROR BANNER ── */
+    .error-banner {
+      margin-bottom: 16px; padding: 12px 16px;
+      background: rgba(220,38,38,0.08);
+      border: 1px solid rgba(220,38,38,0.25);
+      border-radius: 10px; color: var(--red); font-size: 14px; display: none;
+    }
+    .error-banner:not(:empty) { display: flex; align-items: center; gap: 8px; }
+
+    /* ── SECTION TITLE ── */
+    .section-title {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 16px; margin-top: 36px;
+    }
+    .section-title:first-child { margin-top: 0; }
+    .section-title h2 { font-size: 15px; font-weight: 700; color: var(--text); white-space: nowrap; }
+    .section-title-line { flex: 1; height: 1px; background: var(--border); }
+
+    /* ── KPI GRID (3 columnas arriba) ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px; margin-bottom: 14px;
+    }
+    .kpi-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px; margin-bottom: 20px;
+    }
+
+    @media (max-width: 1000px) {
+      .kpi-grid   { grid-template-columns: repeat(2,1fr); }
+      .kpi-grid-2 { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 600px) {
+      .kpi-grid   { grid-template-columns: 1fr; }
+    }
+
+    .kpi-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px 22px 18px;
+      position: relative; overflow: hidden;
+      transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+      animation: fadeUp 0.5s ease both;
+      box-shadow: 0 1px 4px rgba(17,24,39,0.08);
+    }
+    .kpi-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+
+    .kpi-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px; border-radius: 16px 16px 0 0;
+    }
+
+    .kpi-card.orange  { --accent: #ea580c; --accent-glow: rgba(234,88,12,0.10); }
+    .kpi-card.teal    { --accent: #0891b2; --accent-glow: rgba(8,145,178,0.10); }
+    .kpi-card.indigo  { --accent: #4f46e5; --accent-glow: rgba(79,70,229,0.10); }
+    .kpi-card.green   { --accent: #00a85e; --accent-glow: rgba(0,168,94,0.10); }
+    .kpi-card.amber   { --accent: #d97706; --accent-glow: rgba(217,119,6,0.10); }
+
+    .kpi-card::before { background: var(--accent); }
+    .kpi-card:hover   { box-shadow: 0 4px 28px var(--accent-glow); }
+
+    .kpi-label { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 8px; }
+
+    .kpi-value {
+      font-size: 44px; font-weight: 700;
+      color: #111827; line-height: 1;
+      margin-bottom: 6px; letter-spacing: -1px;
+    }
+    .kpi-value.medium { font-size: 36px; }
+
+    .kpi-unit { font-size: 13px; color: var(--muted); }
+
+    .kpi-trend {
+      position: absolute; top: 16px; right: 16px;
+      font-size: 12px; font-weight: 600;
+      color: var(--accent); background: var(--accent-glow);
+      border: 1px solid rgba(0,0,0,0.09);
+      border-radius: 6px; padding: 3px 8px;
+    }
+
+    .loading-val {
+      display: inline-block; width: 60px; height: 32px;
+      background: linear-gradient(90deg, #cdd1da 25%, #d6dae3 50%, #cdd1da 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px; vertical-align: middle;
+    }
+    @keyframes shimmer {
+      0%   { background-position: -100% 0; }
+      100% { background-position:  200% 0; }
+    }
+
+    /* ── OCCUPANCY BAR ── */
+    .occ-bar-wrap {
+      margin-top: 14px;
+    }
+    .occ-bar-track {
+      height: 8px; background: rgba(17,24,39,0.10);
+      border-radius: 4px; overflow: hidden;
+    }
+    .occ-bar-fill {
+      height: 100%; border-radius: 4px;
+      background: var(--accent);
+      transition: width 0.8s cubic-bezier(0.4,0,0.2,1);
+      width: 0%;
+    }
+    .occ-bar-labels {
+      display: flex; justify-content: space-between;
+      margin-top: 4px;
+      font-size: 11px; color: var(--muted); font-family: var(--mono);
+    }
+
+    /* ── CHART PANELS ── */
+    .charts-row {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+      margin-bottom: 16px;
+    }
+    .charts-row-full { margin-bottom: 0; }
+    @media (max-width: 900px) { .charts-row { grid-template-columns: 1fr; } }
+
+    .panel {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+      transition: border-color 0.2s;
+      box-shadow: 0 1px 4px rgba(17,24,39,0.06);
+    }
+    .panel:hover { border-color: var(--border2); }
+
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px; border-bottom: 1px solid var(--border);
+    }
+    .panel-title { font-size: 14px; font-weight: 600; color: var(--text); }
+
+    .panel-badge {
+      font-size: 12px; color: var(--orange);
+      background: rgba(234,88,12,0.09);
+      border: 1px solid rgba(234,88,12,0.22);
+      border-radius: 6px; padding: 3px 10px;
+    }
+
+    .chart-svg-wrap { padding: 12px 16px; }
+    .chart-svg-wrap svg text { font-family: var(--mono); }
+
+    /* Heatmap semanal */
+    .weekly-wrap { padding: 16px 20px; }
+
+    .weekly-grid {
+      display: grid;
+      grid-template-columns: 48px repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .week-day-label {
+      font-family: var(--mono); font-size: 10px;
+      color: var(--muted); text-align: center;
+      padding: 4px 0;
+    }
+    .week-hour-label {
+      font-family: var(--mono); font-size: 9px;
+      color: var(--muted); text-align: right;
+      padding-right: 8px; line-height: 22px;
+    }
+    .week-cell {
+      height: 22px; border-radius: 3px;
+      background: rgba(234,88,12,0.06);
+      transition: background 0.4s;
+      cursor: default;
+    }
+    .week-cell:hover { outline: 1px solid rgba(234,88,12,0.4); }
+
+    /* Barras de clientes por hora */
+    .hour-chart-wrap { padding: 16px 20px 20px; }
+
+    .hour-bars {
+      display: flex; align-items: flex-end; gap: 3px;
+      height: 120px;
+    }
+    .hour-col { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; }
+    .hour-bar-fill {
+      width: 100%; border-radius: 3px 3px 0 0;
+      background: var(--orange);
+      opacity: 0.75;
+      transition: height 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.2s;
+      min-height: 2px;
+    }
+    .hour-col:hover .hour-bar-fill { opacity: 1; }
+    .hour-label { font-family: var(--mono); font-size: 8px; color: var(--muted); }
+    .hour-now .hour-bar-fill { background: var(--indigo); opacity: 1; }
+    .hour-now .hour-label { color: var(--indigo); font-weight: 700; }
+
+    /* ── FOOTER ── */
+    footer {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 28px; border-top: 1px solid var(--border);
+      font-size: 12px; color: var(--muted);
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .kpi-card:nth-child(1) { animation-delay: 0.05s; }
+    .kpi-card:nth-child(2) { animation-delay: 0.10s; }
+    .kpi-card:nth-child(3) { animation-delay: 0.15s; }
+    .kpi-card:nth-child(4) { animation-delay: 0.18s; }
+    .kpi-card:nth-child(5) { animation-delay: 0.21s; }
+
+    /* ── TOOLTIP ── */
+    .tooltip-box {
+      position: fixed; z-index: 999;
+      background: #1e2535; color: #f0f0f0;
+      font-family: var(--mono); font-size: 11px;
+      padding: 6px 10px; border-radius: 6px;
+      pointer-events: none; opacity: 0;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+    .tooltip-box.visible { opacity: 1; }
+
+    /* ── AFORO ALERT ── */
+    .aforo-alert {
+      display: none; align-items: center; gap: 10px;
+      padding: 10px 16px; border-radius: 10px;
+      font-size: 13px; font-weight: 600;
+      margin-top: 10px;
+    }
+    .aforo-alert.warning { display: flex; background: rgba(217,119,6,0.12); border: 1px solid rgba(217,119,6,0.30); color: var(--amber); }
+    .aforo-alert.danger  { display: flex; background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.30); color: var(--red); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-area">
+    <div class="logo-hex">
+      <svg width="34" height="34" viewBox="0 0 44 44" fill="none">
+        <polygon points="22,4 38,13 38,31 22,40 6,31 6,13"
+          fill="rgba(234,88,12,0.10)" stroke="#ea580c" stroke-width="1.5"/>
+        <polygon points="22,10 32,16 32,28 22,34 12,28 12,16"
+          fill="none" stroke="rgba(234,88,12,0.32)" stroke-width="0.8"/>
+        <circle cx="22" cy="22" r="4" fill="#ea580c"/>
+        <circle cx="22" cy="22" r="7.5" fill="none" stroke="rgba(234,88,12,0.35)" stroke-width="0.8"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-name">NAYAR</div>
+      <div class="logo-tagline">Panel de aforo WiFi · v2.0</div>
+    </div>
+    <div class="sector-badge">🛍️ Hostelería &amp; Retail</div>
+  </div>
+
+  <div class="header-right">
+    <div class="status-pill">
+      <div class="status-dot offline" id="statusDot"></div>
+      <span id="statusLabel">Sin conexión</span>
+    </div>
+    <div class="last-update" id="lastUpdate"></div>
+  </div>
+</header>
+
+<!-- CONFIG BAR -->
+<div class="config-bar">
+  <label>Canal ID</label>
+  <input type="text" id="channelId" placeholder="ej: 2345678">
+
+  <label>Clave API</label>
+  <input type="text" id="apiKey" placeholder="ej: XXXXXXXXXXXXXXXX">
+
+  <label>Aforo máx.</label>
+  <input type="number" id="aforoMax" placeholder="ej: 50" style="width:100px">
+
+  <button class="btn btn-primary" onclick="startPolling()">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+    Conectar
+  </button>
+  <button class="btn btn-secondary" onclick="stopPolling()">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+    Detener
+  </button>
+  <span class="config-hint">· campo1=dispositivos · campo2=clientes_diarios · campo3=distancia_media</span>
+</div>
+
+<!-- MAIN -->
+<main>
+
+  <div class="error-banner" id="errorBanner"></div>
+
+  <!-- ─── FILA 1: 3 KPIs principales ─── -->
+  <div class="section-title">
+    <h2>Resumen en tiempo real</h2>
+    <div class="section-title-line"></div>
+  </div>
+
+  <div class="kpi-grid">
+    <!-- KPI 1: Dispositivos detectados -->
+    <div class="kpi-card orange">
+      <div class="kpi-label">Dispositivos detectados</div>
+      <div class="kpi-value" id="kpiDevices"><span class="loading-val"></span></div>
+      <div class="kpi-unit">presentes ahora mismo</div>
+      <span class="kpi-trend" id="trendDevices">—</span>
+    </div>
+
+    <!-- KPI 2: Ocupación en tiempo real -->
+    <div class="kpi-card teal">
+      <div class="kpi-label">Ocupación en tiempo real</div>
+      <div class="kpi-value medium" id="kpiOccupancy"><span class="loading-val"></span></div>
+      <div class="kpi-unit">% del aforo máximo</div>
+      <span class="kpi-trend" id="trendOcc">—</span>
+      <div class="occ-bar-wrap">
+        <div class="occ-bar-track">
+          <div class="occ-bar-fill" id="occBar"></div>
+        </div>
+        <div class="occ-bar-labels"><span>0%</span><span>50%</span><span>100%</span></div>
+      </div>
+      <div class="aforo-alert" id="aforoAlert">
+        <span id="aforoAlertIcon">⚠️</span>
+        <span id="aforoAlertText">Aforo elevado</span>
+      </div>
+    </div>
+
+    <!-- KPI 3: Clientes diarios -->
+    <div class="kpi-card indigo">
+      <div class="kpi-label">Clientes diarios</div>
+      <div class="kpi-value" id="kpiDaily"><span class="loading-val"></span></div>
+      <div class="kpi-unit">visitas contabilizadas hoy</div>
+      <span class="kpi-trend" id="trendDaily">—</span>
+    </div>
+  </div>
+
+  <!-- ─── CHARTS ROW 1: historial dispositivos + clientes/hora ─── -->
+  <div class="section-title">
+    <h2>Evolución y distribución</h2>
+    <div class="section-title-line"></div>
+  </div>
+
+  <div class="charts-row">
+    <!-- Historial de dispositivos -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Dispositivos detectados · historial</span>
+        <span class="panel-badge" id="chartPoints">0 datos</span>
+      </div>
+      <div class="chart-svg-wrap">
+        <svg id="devChart" width="100%" height="180" viewBox="0 0 600 180" preserveAspectRatio="none">
+          <text x="300" y="95" text-anchor="middle" fill="rgba(17,24,39,0.28)" font-family="Space Mono, monospace" font-size="11">ESPERANDO DATOS...</text>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Clientes por hora (barras) -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Clientes por hora · hoy</span>
+        <span class="panel-badge" id="hourBadge">hora actual</span>
+      </div>
+      <div class="hour-chart-wrap">
+        <div class="hour-bars" id="hourBars">
+          <!-- generado por JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── CHARTS ROW 2: tendencia semanal (heatmap) ─── -->
+  <div class="section-title" style="margin-top:20px">
+    <h2>Tendencia semanal de uso</h2>
+    <div class="section-title-line"></div>
+  </div>
+
+  <div class="panel charts-row-full">
+    <div class="panel-header">
+      <span class="panel-title">Mapa de calor · últimos 7 días por franja horaria</span>
+      <span class="panel-badge" id="weekBadge">—</span>
+    </div>
+    <div class="weekly-wrap">
+      <div class="weekly-grid" id="weeklyGrid">
+        <!-- generado por JS -->
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <span>NAYAR · Hostelería &amp; Retail Dashboard</span>
+  <span id="footerChannel">Canal: —</span>
+  <span>Raspberry Pi + ThingSpeak</span>
+</footer>
+
+<!-- Tooltip flotante -->
+<div class="tooltip-box" id="tooltip"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════
+   NAYAR — Dashboard Hostelería & Retail
+   ───────────────────────────────────────────────────────────
+   MAPEO DE CAMPOS THINGSPEAK  (ajusta según tu canal Python)
+   ─────────────────────────────
+   field1  →  dispositivos_detectados   (número entero)
+   field2  →  clientes_diarios          (contador acumulado del día)
+   field3  →  distancia_media_metros    (float, para calcular ocupación)
+
+   Si tu script Python escribe en campos distintos, cambia
+   los índices en la función parseEntry() más abajo.
+
+   AFORO MÁXIMO: se configura en el input "Aforo máx." de la barra,
+   o con la constante DEFAULT_AFORO si no se rellena.
+═══════════════════════════════════════════════════════════ */
+
+const THINGSPEAK_BASE  = 'https://api.thingspeak.com/channels';
+const POLL_INTERVAL_MS = 30000;   // 30 segundos
+const HISTORY_POINTS   = 20;      // puntos visibles en el gráfico de línea
+const DEFAULT_AFORO    = 50;      // aforo por defecto si no se introduce
+
+let pollingTimer   = null;
+let history        = [];           // [{ts, devices, daily}]
+let hourlyData     = new Array(24).fill(0);  // acumulado por hora (hoy)
+let weeklyData     = [];           // 7 días × franjas horarias
+let previousDevices = null;
+let previousOcc     = null;
+let previousDaily   = null;
+
+// ─── Parsea una entrada de ThingSpeak ───────────────────────
+function parseEntry(entry) {
+  return {
+    ts:      new Date(entry.created_at),
+    devices: parseInt(entry.field1)  || 0,   // ← field1 = dispositivos
+    daily:   parseInt(entry.field2)  || 0,   // ← field2 = clientes diarios
+    dist:    parseFloat(entry.field3) || 0   // ← field3 = distancia media
+  };
+}
+
+// ─── Calcula % ocupación ────────────────────────────────────
+function calcOccupancy(devices) {
+  const max = parseInt(document.getElementById('aforoMax').value) || DEFAULT_AFORO;
+  return Math.min(100, Math.round((devices / max) * 100));
+}
+
+// ─── Fetch principal ────────────────────────────────────────
+async function fetchData() {
+  const chId   = document.getElementById('channelId').value.trim();
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const errEl  = document.getElementById('errorBanner');
+
+  if (!chId || !apiKey) {
+    errEl.textContent = '⚠ Introduce el Canal ID y la Clave API para conectar.';
+    return;
+  }
+
+  const url = `${THINGSPEAK_BASE}/${chId}/feeds.json?api_key=${apiKey}&results=${HISTORY_POINTS}`;
+
+  try {
+    const res  = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    errEl.textContent = '';
+
+    const feeds = (data.feeds || []).map(parseEntry).filter(e => !isNaN(e.devices));
+    if (!feeds.length) return;
+
+    const latest = feeds[feeds.length - 1];
+    history      = feeds;
+
+    updateKPIs(latest, feeds);
+    updateDeviceChart(feeds);
+    updateHourlyFromFeeds(feeds);
+    updateHourBars();
+    updateWeeklyHeatmap(feeds);
+    setStatus(true, latest.ts);
+
+    document.getElementById('footerChannel').textContent = `Canal: ${chId}`;
+
+  } catch (err) {
+    errEl.textContent = `⚠ Error al conectar con ThingSpeak: ${err.message}`;
+    setStatus(false);
+  }
+}
+
+// ─── Actualiza KPIs ─────────────────────────────────────────
+function updateKPIs(latest, feeds) {
+  const occ   = calcOccupancy(latest.devices);
+  const prev  = feeds.length > 1 ? feeds[feeds.length - 2] : null;
+
+  // Dispositivos
+  setKpi('kpiDevices', latest.devices, '');
+  if (prev !== null) {
+    const diff = latest.devices - prev.devices;
+    setTrend('trendDevices', diff, diff >= 0 ? `+${diff}` : `${diff}`);
+  }
+
+  // Ocupación
+  document.getElementById('kpiOccupancy').textContent = `${occ}%`;
+  document.getElementById('occBar').style.width = `${occ}%`;
+  if (prev !== null) {
+    const prevOcc = calcOccupancy(prev.devices);
+    const dOcc    = occ - prevOcc;
+    setTrend('trendOcc', dOcc, dOcc >= 0 ? `+${dOcc}%` : `${dOcc}%`);
+  }
+
+  // Alerta aforo
+  const alertEl   = document.getElementById('aforoAlert');
+  const alertIcon = document.getElementById('aforoAlertIcon');
+  const alertText = document.getElementById('aforoAlertText');
+  alertEl.className = 'aforo-alert';
+  if (occ >= 90) {
+    alertEl.classList.add('danger');
+    alertIcon.textContent = '🔴';
+    alertText.textContent = `Aforo crítico (${occ}% — casi lleno)`;
+  } else if (occ >= 70) {
+    alertEl.classList.add('warning');
+    alertIcon.textContent = '⚠️';
+    alertText.textContent = `Aforo elevado (${occ}%)`;
+  }
+
+  // Clientes diarios
+  setKpi('kpiDaily', latest.daily, '');
+  if (prev !== null) {
+    const diff = latest.daily - prev.daily;
+    setTrend('trendDaily', diff, diff >= 0 ? `+${diff}` : `${diff}`);
+  }
+
+  previousDevices = latest.devices;
+  previousOcc     = occ;
+  previousDaily   = latest.daily;
+}
+
+function setKpi(id, val, suffix) {
+  document.getElementById(id).textContent = val + suffix;
+}
+function setTrend(id, diff, label) {
+  const el  = document.getElementById(id);
+  el.textContent = label;
+  el.style.color = diff > 0 ? 'var(--green)' : diff < 0 ? 'var(--red)' : 'var(--muted)';
+}
+
+// ─── Gráfico de línea: dispositivos ─────────────────────────
+function updateDeviceChart(feeds) {
+  const svg = document.getElementById('devChart');
+  const W = 600, H = 180, padL = 36, padR = 12, padT = 16, padB = 30;
+
+  const vals  = feeds.map(f => f.devices);
+  const times = feeds.map(f => f.ts);
+  const minV  = Math.max(0, Math.min(...vals) - 2);
+  const maxV  = Math.max(...vals) + 2;
+
+  const xScale = i  => padL + (i / (feeds.length - 1 || 1)) * (W - padL - padR);
+  const yScale = v  => padT + (1 - (v - minV) / (maxV - minV || 1)) * (H - padT - padB);
+
+  let path = feeds.map((f, i) => `${i === 0 ? 'M' : 'L'}${xScale(i).toFixed(1)},${yScale(f.devices).toFixed(1)}`).join(' ');
+  let area = `${path} L${xScale(feeds.length-1).toFixed(1)},${H - padB} L${xScale(0).toFixed(1)},${H - padB} Z`;
+
+  const hLines = 4;
+  let gridLines = '';
+  for (let i = 0; i <= hLines; i++) {
+    const y = padT + (i / hLines) * (H - padT - padB);
+    const v = Math.round(maxV - (i / hLines) * (maxV - minV));
+    gridLines += `<line x1="${padL}" y1="${y.toFixed(1)}" x2="${W - padR}" y2="${y.toFixed(1)}" stroke="rgba(17,24,39,0.07)" stroke-width="1"/>`;
+    gridLines += `<text x="${padL - 4}" y="${(y + 4).toFixed(1)}" text-anchor="end" fill="rgba(17,24,39,0.35)" font-size="9">${v}</text>`;
+  }
+
+  // Etiquetas eje X (cada N puntos)
+  let xLabels = '';
+  const step  = Math.max(1, Math.floor(feeds.length / 5));
+  feeds.forEach((f, i) => {
+    if (i % step === 0 || i === feeds.length - 1) {
+      const hh = f.ts.getHours().toString().padStart(2,'0');
+      const mm = f.ts.getMinutes().toString().padStart(2,'0');
+      xLabels += `<text x="${xScale(i).toFixed(1)}" y="${H - padB + 14}" text-anchor="middle" fill="rgba(17,24,39,0.38)" font-size="9">${hh}:${mm}</text>`;
+    }
+  });
+
+  // Puntos interactivos
+  let dots = feeds.map((f, i) => {
+    const cx = xScale(i).toFixed(1);
+    const cy = yScale(f.devices).toFixed(1);
+    const hh = f.ts.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+    return `<circle cx="${cx}" cy="${cy}" r="4" fill="#ea580c" stroke="#dde1e8" stroke-width="2" style="cursor:default"
+      onmouseenter="showTip(event,'${hh} — ${f.devices} dispositivos')"
+      onmouseleave="hideTip()"/>`;
+  }).join('');
+
+  svg.innerHTML = `
+    ${gridLines}
+    <defs>
+      <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%"   stop-color="#ea580c" stop-opacity="0.18"/>
+        <stop offset="100%" stop-color="#ea580c" stop-opacity="0.02"/>
+      </linearGradient>
+    </defs>
+    <path d="${area}" fill="url(#areaGrad)"/>
+    <path d="${path}" fill="none" stroke="#ea580c" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+    ${dots}
+    ${xLabels}
+  `;
+  document.getElementById('chartPoints').textContent = `${feeds.length} datos`;
+}
+
+// ─── Clientes por hora ───────────────────────────────────────
+function updateHourlyFromFeeds(feeds) {
+  const today = new Date();
+  feeds.forEach(f => {
+    if (f.ts.toDateString() === today.toDateString()) {
+      const h = f.ts.getHours();
+      // Tomamos el máximo de daily visto en esa hora como proxy de visitas
+      hourlyData[h] = Math.max(hourlyData[h], f.daily);
+    }
+  });
+}
+
+function updateHourBars() {
+  const nowH   = new Date().getHours();
+  const maxVal = Math.max(...hourlyData, 1);
+  const wrap   = document.getElementById('hourBars');
+
+  wrap.innerHTML = Array.from({length: 24}, (_, h) => {
+    const val = hourlyData[h];
+    const pct = (val / maxVal) * 100;
+    const cls = h === nowH ? 'hour-col hour-now' : 'hour-col';
+    const lbl = `${h.toString().padStart(2,'0')}h`;
+    return `<div class="${cls}">
+      <div class="hour-bar-fill" style="height:${pct}%"
+        onmouseenter="showTip(event,'${lbl} — ${val} clientes')"
+        onmouseleave="hideTip()"></div>
+      <div class="hour-label">${h % 3 === 0 ? lbl : ''}</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('hourBadge').textContent = `hora actual: ${nowH.toString().padStart(2,'0')}h`;
+}
+
+// ─── Heatmap semanal ─────────────────────────────────────────
+function buildWeeklyGrid() {
+  const days   = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  // Franjas horarias (4 franjas de 6h)
+  const slots  = ['00–06','06–12','12–18','18–24'];
+  const grid   = document.getElementById('weeklyGrid');
+
+  // Cabecera
+  let html = '<div></div>';
+  days.forEach(d => { html += `<div class="week-day-label">${d}</div>`; });
+
+  // Filas por franja
+  slots.forEach((slot, si) => {
+    html += `<div class="week-hour-label">${slot}</div>`;
+    days.forEach((_, di) => {
+      html += `<div class="week-cell" id="wc-${di}-${si}"
+        onmouseenter="showTip(event,'${days[di]} ${slot}')"
+        onmouseleave="hideTip()"></div>`;
+    });
+  });
+
+  grid.innerHTML = html;
+}
+
+function updateWeeklyHeatmap(feeds) {
+  // Construye acumulado por (día_semana, franja)
+  const acc = Array.from({length:7}, () => [0,0,0,0]);
+  const cnt = Array.from({length:7}, () => [0,0,0,0]);
+
+  feeds.forEach(f => {
+    // 0=Dom en JS → convertimos a 0=Lun
+    const jsDay = f.ts.getDay();
+    const di    = jsDay === 0 ? 6 : jsDay - 1;
+    const h     = f.ts.getHours();
+    const si    = Math.floor(h / 6);
+    acc[di][si] += f.devices;
+    cnt[di][si]++;
+  });
+
+  // Máximo global para normalizar
+  let maxVal = 1;
+  acc.forEach(row => row.forEach(v => { if (v > maxVal) maxVal = v; }));
+
+  for (let di = 0; di < 7; di++) {
+    for (let si = 0; si < 4; si++) {
+      const el = document.getElementById(`wc-${di}-${si}`);
+      if (!el) continue;
+      const avg = cnt[di][si] > 0 ? acc[di][si] / cnt[di][si] : 0;
+      const intensity = avg / maxVal;
+      el.style.background = `rgba(234,88,12,${(intensity * 0.75 + 0.04).toFixed(2)})`;
+      el.setAttribute('data-tip', `${avg.toFixed(0)} dispositivos`);
+      el.onmouseenter = (e) => showTip(e, el.getAttribute('data-tip'));
+    }
+  }
+
+  document.getElementById('weekBadge').textContent =
+    `${feeds.length} registros analizados`;
+}
+
+// ─── Status ──────────────────────────────────────────────────
+function setStatus(online, ts) {
+  const dot   = document.getElementById('statusDot');
+  const label = document.getElementById('statusLabel');
+  const upd   = document.getElementById('lastUpdate');
+  if (online) {
+    dot.className   = 'status-dot online';
+    label.textContent = 'En línea';
+    const hh = ts.getHours().toString().padStart(2,'0');
+    const mm = ts.getMinutes().toString().padStart(2,'0');
+    const ss = ts.getSeconds().toString().padStart(2,'0');
+    upd.textContent = `Último dato: ${hh}:${mm}:${ss}`;
+  } else {
+    dot.className   = 'status-dot offline';
+    label.textContent = 'Sin conexión';
+    upd.textContent = '';
+  }
+}
+
+// ─── Polling ─────────────────────────────────────────────────
+function startPolling() {
+  stopPolling();
+  fetchData();
+  pollingTimer = setInterval(fetchData, POLL_INTERVAL_MS);
+}
+function stopPolling() {
+  if (pollingTimer) { clearInterval(pollingTimer); pollingTimer = null; }
+  setStatus(false);
+}
+
+// ─── Tooltip ─────────────────────────────────────────────────
+function showTip(e, text) {
+  const tip = document.getElementById('tooltip');
+  tip.textContent = text;
+  tip.classList.add('visible');
+  moveTip(e);
+  document.addEventListener('mousemove', moveTip);
+}
+function hideTip() {
+  const tip = document.getElementById('tooltip');
+  tip.classList.remove('visible');
+  document.removeEventListener('mousemove', moveTip);
+}
+function moveTip(e) {
+  const tip = document.getElementById('tooltip');
+  tip.style.left = (e.clientX + 14) + 'px';
+  tip.style.top  = (e.clientY - 28) + 'px';
+}
+
+// ─── Init ────────────────────────────────────────────────────
+buildWeeklyGrid();
+updateHourBars();
+</script>
+</body>
+</html>
