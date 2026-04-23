@@ -451,6 +451,24 @@
       margin-right: 4px;
     }
  
+    /* ── ERROR BANNER ── */
+    .error-banner {
+      margin: 12px 28px 0;
+      max-width: 1400px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 12px 16px;
+      background: rgba(220,38,38,0.08);
+      border: 1px solid rgba(220,38,38,0.25);
+      border-radius: 10px;
+      color: var(--red);
+      font-size: 14px;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .error-banner.visible { display: flex; }
+
     /* PAGE TITLE */
     .page-title-bar {
       padding: 28px 28px 0;
@@ -583,8 +601,8 @@
   </div>
   <div class="header-right">
     <div class="status-pill">
-      <div class="status-dot online"></div>
-      <span>En directo</span>
+      <div class="status-dot" style="background:rgba(17,24,39,0.22);"></div>
+      <span>Sin conexión</span>
     </div>
   </div>
 </header>
@@ -612,6 +630,9 @@
     Detener
   </button>
 </div>
+ 
+<!-- ERROR BANNER -->
+<div class="error-banner" id="errorBanner"></div>
  
 <!-- MAIN -->
 <main>
@@ -774,6 +795,210 @@
   <span>Raspberry Pi + ThingSpeak</span>
 </footer>
  
-<script src="javascript_nuevo.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   NAYAR — Dashboard Oficinas & Coworking
+   ─────────────────────────────────────────────────────────
+   MAPEO DE CAMPOS THINGSPEAK
+   field1  → dispositivos_zona_a
+   field2  → dispositivos_zona_b
+   field3  → dispositivos_zona_c
+   field4  → ocupacion_escritorios (%)
+   field5  → ocupacion_salas (%)
+═══════════════════════════════════════════════════════════ */
+
+const THINGSPEAK_BASE  = 'https://api.thingspeak.com/channels';
+const POLL_INTERVAL_MS = 30000;
+const HISTORY_POINTS   = 20;
+
+let pollingTimer = null;
+
+// ─── Status ──────────────────────────────────────────────
+function setStatus(online) {
+  const dot   = document.querySelector('.status-dot');
+  const label = dot ? dot.nextElementSibling : null;
+  if (!dot) return;
+  if (online) {
+    dot.className = 'status-dot online';
+    if (label) label.textContent = 'En directo';
+  } else {
+    dot.className = 'status-dot';
+    dot.style.background = 'rgba(17,24,39,0.22)';
+    if (label) label.textContent = 'Sin conexión';
+  }
+}
+
+// ─── Fetch ───────────────────────────────────────────────
+async function fetchData() {
+  const chId   = document.getElementById('channelId').value.trim();
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const errEl  = document.getElementById('errorBanner');
+
+  if (!chId || !apiKey) {
+    errEl.textContent = '⚠ Introduce el Canal ID y la Clave API para conectar.';
+    errEl.classList.add('visible');
+    stopPolling();
+    return;
+  }
+
+  const url = `${THINGSPEAK_BASE}/${chId}/feeds.json?api_key=${apiKey}&results=${HISTORY_POINTS}`;
+
+  try {
+    const res  = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+
+    errEl.textContent = '';
+    errEl.classList.remove('visible');
+
+    const feeds = data.feeds || [];
+    if (!feeds.length) return;
+
+    const latest = feeds[feeds.length - 1];
+
+    // Dispositivos por zona
+    const zA = parseInt(latest.field1) || 0;
+    const zB = parseInt(latest.field2) || 0;
+    const zC = parseInt(latest.field3) || 0;
+    const total = zA + zB + zC;
+
+    setVal('rtZonaA', zA);
+    setVal('rtZonaB', zB);
+    setVal('rtZonaC', zC);
+    setVal('rtTotal', total);
+
+    // Ocupación
+    const ocupEsc  = parseInt(latest.field4) || 0;
+    const ocupSala = parseInt(latest.field5) || 0;
+    updateOcupacion('ocupEsc', 'ocupEscBar', 'ocupEscPill', ocupEsc, 50);
+    updateOcupacion('ocupSala', 'ocupSalaBar', 'ocupSalaPill', ocupSala, 6);
+
+    // Estancia (simulada desde distancia media si disponible)
+    // Mantiene valores actuales si no hay campo específico
+
+    setStatus(true);
+    updateWeekly(feeds);
+
+  } catch (err) {
+    errEl.textContent = `⚠ Error al conectar con ThingSpeak: ${err.message}`;
+    errEl.classList.add('visible');
+    setStatus(false);
+  }
+}
+
+function setVal(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = val;
+}
+
+function updateOcupacion(pctId, barId, pillId, pct, total) {
+  const el    = document.getElementById(pctId);
+  const bar   = document.getElementById(barId);
+  const pill  = document.getElementById(pillId);
+  if (el)   el.textContent = pct;
+  if (bar)  bar.style.width = `${pct}%`;
+  if (pill) {
+    if (pct >= 85) {
+      pill.className = 'ocup-pill hi';
+      pill.textContent = 'Alta';
+    } else if (pct >= 60) {
+      pill.className = 'ocup-pill mid';
+      pill.textContent = 'Media';
+    } else {
+      pill.className = 'ocup-pill ok';
+      pill.textContent = 'Normal';
+    }
+  }
+  // Detalles de escritorios / salas
+  const detalleEl = document.getElementById(pctId + 'Detalle');
+  const libEl     = document.getElementById(pctId + 'Lib');
+  if (detalleEl && libEl) {
+    const ocupados = Math.round((pct / 100) * total);
+    const libres   = total - ocupados;
+    const tipo     = pctId === 'ocupEsc' ? 'escritorios' : 'salas';
+    detalleEl.textContent = `${ocupados} de ${total} ${tipo} ocupados`;
+    libEl.textContent = `${libres} libre${libres !== 1 ? 's' : ''}`;
+  }
+}
+
+// ─── Tendencia semanal ────────────────────────────────────
+function updateWeekly(feeds) {
+  const days  = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const today = new Date();
+  const todayDow = today.getDay() === 0 ? 6 : today.getDay() - 1;
+
+  const acc = new Array(7).fill(0);
+  const cnt = new Array(7).fill(0);
+
+  feeds.forEach(f => {
+    const d = new Date(f.created_at);
+    const dow = d.getDay() === 0 ? 6 : d.getDay() - 1;
+    const val = (parseInt(f.field1)||0) + (parseInt(f.field2)||0) + (parseInt(f.field3)||0);
+    acc[dow] += val;
+    cnt[dow]++;
+  });
+
+  const avgs = acc.map((v, i) => cnt[i] > 0 ? Math.round(v / cnt[i]) : 0);
+  const maxVal = Math.max(...avgs, 1);
+
+  const wrap = document.getElementById('weeklyDays');
+  if (!wrap) return;
+
+  wrap.innerHTML = days.map((d, i) => {
+    const pct = Math.round((avgs[i] / maxVal) * 100);
+    const isToday = i === todayDow;
+    const isWeekend = i >= 5;
+    const color = isWeekend ? 'rgba(17,24,39,0.15)' : '#1a6cff';
+    return `<div class="weekly-day${isToday ? ' wd-today' : ''}">
+      <div class="wd-name">${d}</div>
+      <div class="wd-bar-wrap">
+        <div class="wd-bar" style="height:${pct}%;background:${color};"></div>
+      </div>
+      <div class="wd-pct">${avgs[i] > 0 ? avgs[i] : '—'}</div>
+    </div>`;
+  }).join('');
+
+  const badge = document.getElementById('weekBadge');
+  if (badge) {
+    const wn = getWeekNumber(today);
+    badge.textContent = `Semana ${wn}`;
+  }
+  const hoy = document.getElementById('weeklyHoy');
+  if (hoy) hoy.textContent = avgs[todayDow] > 0 ? `${avgs[todayDow]} disp.` : '—';
+}
+
+function getWeekNumber(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil((((date - yearStart) / 86400000) + 1) / 7);
+}
+
+// ─── Polling ─────────────────────────────────────────────
+function startPolling() {
+  stopPolling();
+  fetchData();
+  pollingTimer = setInterval(fetchData, POLL_INTERVAL_MS);
+}
+
+function stopPolling() {
+  if (pollingTimer) { clearInterval(pollingTimer); pollingTimer = null; }
+  setStatus(false);
+}
+
+// ─── Init: render semana vacía ────────────────────────────
+(function initWeekly() {
+  const days = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const wrap = document.getElementById('weeklyDays');
+  if (!wrap) return;
+  wrap.innerHTML = days.map(d => `<div class="weekly-day">
+    <div class="wd-name">${d}</div>
+    <div class="wd-bar-wrap"><div class="wd-bar" style="height:0%;background:#1a6cff;"></div></div>
+    <div class="wd-pct">—</div>
+  </div>`).join('');
+  const badge = document.getElementById('weekBadge');
+  if (badge) badge.textContent = `Semana ${getWeekNumber(new Date())}`;
+})();
+</script>
 </body>
 </html>
